@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jugnu | Adolescent Health Tracking - Anahat</title>
+
+  <!-- Fonts: Outfit for display, DM Sans for UI, JetBrains Mono for data -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Outfit', 'sans-serif'],
+            body: ['DM Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            surface: '#151e32',
+            surfaceLight: '#1e293b',
+            bgDark: '#020617',
+            accentCyan: '#22d3ee',
+            accentRose: '#f43f5e',
+            accentEmerald: '#34d399',
+            accentAmber: '#f59e0b',
+            borderSubtle: 'rgba(255,255,255,0.08)',
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+            'pulse-dot': 'pulseDot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'shimmer': 'shimmer 2.5s infinite linear',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            pulseDot: {
+              '0%, 100%': { opacity: '1', boxShadow: '0 0 0 0px rgba(244, 63, 94, 0.5)' },
+              '50%': { opacity: '0.7', boxShadow: '0 0 0 8px rgba(244, 63, 94, 0)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-1000px 0' },
+              '100%': { backgroundPosition: '1000px 0' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body {
+      background: radial-gradient(ellipse 90% 60% at 50% 0%, #0f172a 0%, #020617 100%);
+      min-height: 100vh;
+      color: #f1f5f9;
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Glass card utility */
+    .glass-card {
+      background: rgba(21, 30, 50, 0.65);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    /* Smooth number transition feel */
+    .metric-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Stagger animation delays via inline styles handled in JS, but base setup here */
+    .animate-stagger {
+      opacity: 0;
+    }
+
+    /* Chart container */
+    .chart-container {
+      position: relative;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body class="antialiased selection:bg-cyan-500/30">
+
+  <!-- ============================================================ -->
+  <!-- DATA INTEGRATION LAYER                                       -->
+  <!-- ============================================================ -->
+  <!--                                                              -->
+  <!-- Backend ingestion is structured to pull from these datasets: -->
+  <!--   Mockup 1.xlsx  -> Adolescent screening & anemia data       -->
+  <!--   Mockup 2.xlsx  -> Menstrual hygiene & school attendance    -->
+  <!--   Mockup 3.xlsx  -> ASHA worker activity & camp logs         -->
+  <!--   Mockup 4.xlsx  -> Government scheme application status     -->
+  <!--   Mockup 5.xlsx  -> Alert engine & early warning triggers    -->
+  <!--                                                              -->
+  <!-- All xlsx files are parsed server-side and exposed via a      -->
+  <!-- consolidated /api/dashboard endpoint consumed below.         -->
+  <!-- ============================================================ -->
+
+  <div class="max-w-[1440px] mx-auto px-6 py-8">
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 animate-stagger" style="animation-delay: 0.1s" data-animate>
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="font-display text-3xl font-bold tracking-tight text-white">JUGNU</h1>
+          <p class="text-sm text-slate-400 font-body tracking-wide">Adolescent Health Tracking by <span class="text-cyan-400 font-semibold">Anahat</span></p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="glass-card rounded-full px-5 py-2 flex items-center gap-2">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span class="text-xs font-medium text-slate-300 font-body">Live Sync</span>
+        </div>
+        <div class="glass-card rounded-lg px-4 py-2 text-xs text-slate-400 font-body">
+          <span class="text-slate-500">Region:</span> Alipurduar Tea Gardens
+        </div>
+      </div>
+    </header>
+
+    <!-- ==================== KPI CARDS ==================== -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+      <!-- KPI 1: Anemia -->
+      <div class="glass-card rounded-2xl p-6 relative overflow-hidden animate-stagger group hover:border-rose-500/30 transition-colors duration-500" style="animation-delay: 0.2s" data-animate>
+        <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/20 transition-all duration-500"></div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-rose-500/15 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 006.364 0 4.5 4.5 0 016.364 0 4.5 4.5 0 010 6.364 4.5 4.5 0 01-6.364 0 4.5 4.5 0 01-6.364-6.364z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </div>
+              <span class="text-xs font-semibold tracking-wider text-rose-400 uppercase">Critical Alert</span>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-medium text-rose-400 bg-rose-500/10 px-2 py-1 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              12% this month
+            </span>
+          </div>
+          <div class="metric-number text-5xl font-bold text-white mb-2 tracking-tight" data-countup="847">0</div>
+          <p class="text-sm text-slate-400 font-body leading-relaxed">Adolescent children screened with <span class="text-rose-300 font-medium">anemia</span>. Routine IFA tablet follow-up due.</p>
+          <div class="mt-5 h-12 w-full">
+            <canvas id="sparkAnemia"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI 2: Menstrual Pads -->
+      <div class="glass-card rounded-2xl p-6 relative overflow-hidden animate-stagger group hover:border-amber-500/30 transition-colors duration-500" style="animation-delay: 0.35s" data-animate>
+        <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all duration-500"></div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-amber-500/15 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                </svg>
+              </div>
+              <span class="text-xs font-semibold tracking-wider text-amber-400 uppercase">Dropout Risk</span>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-medium text-amber-400 bg-amber-500/10 px-2 py-1 rounded-md">
+              Action needed
+            </span>
+          </div>
+          <div class="metric-number text-5xl font-bold text-white mb-2 tracking-tight" data-countup="241">0</div>
+          <p class="text-sm text-slate-400 font-body leading-relaxed">Girls who have <span class="text-amber-300 font-medium">not received</span> menstrual pads. Directly linked to school absenteeism.</p>
+          <div class="mt-5 h-12 w-full">
+            <canvas id="sparkPads"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI 3: Health Camps -->
+      <div class="glass-card rounded-2xl p-6 relative overflow-hidden animate-stagger group hover:border-emerald-500/30 transition-colors duration-500" style="animation-delay: 0.5s" data-animate>
+        <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all duration-500"></div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span class="text-xs font-semibold tracking-wider text-emerald-400 uppercase">Impact</span>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              +8 this week
+            </span>
+          </div>
+          <div class="metric-number text-5xl font-bold text-white mb-2 tracking-tight" data-countup="42">0</div>
+          <p class="text-sm text-slate-400 font-body leading-relaxed">Health camps conducted by <span class="text-emerald-300 font-medium">ASHA workers</span> across assigned sectors.</p>
+          <div class="mt-5 h-12 w-full">
+            <canvas id="sparkCamps"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== CHART + ALERTS ROW ==================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+      <!-- Chart: Government Schemes -->
+      <div class="lg:col-span-2 glass-card rounded-2xl p-6 animate-stagger" style="animation-delay: 0.65s" data-animate>
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="font-display text-lg font-semibold text-white">Government Schemes Access</h2>
+            <p class="text-xs text-slate-400 mt-1 font-body">Tracking application pipeline across welfare programs</p>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex items-center gap-2 text-xs text-slate-300">
+              <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span> Applied
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-300">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Pending
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-300">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Sanctioned
+            </div>
+          </div>
+        </div>
+        <div class="h-[320px] w-full">
+          <canvas id="schemesChart"></canvas>
+        </div>
+        <div class="mt-4 pt-4 border-t border-white/5 grid grid-cols-3 gap-4">
+          <div class="text-center">
+            <div class="metric-number text-lg font-semibold text-cyan-400">1,842</div>
+            <div class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mt-1">Total Applied</div>
+          </div>
+          <div class="text-center border-x border-white/5">
+            <div class="metric-number text-lg font-semibold text-amber-400">634</div>
+            <div class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mt-1">Pending Action</div>
+          </div>
+          <div class="text-center">
+            <div class="metric-number text-lg font-semibold text-emerald-400">1,208</div>
+            <div class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mt-1">Sanctioned</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerts Feed -->
+      <div class="glass-card rounded-2xl p-6 animate-stagger flex flex-col h-full" style="animation-delay: 0.8s" data-animate>
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="font-display text-lg font-semibold text-white">Early Warning Flags</h2>
+            <p class="text-xs text-slate-400 mt-1 font-body">Real-time alerts for frontline workers</p>
+          </div>
+          <div class="w-8 h-8 rounded-lg bg-rose-500/15 flex items-center justify-center relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+            </span>
+          </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto pr-2 space-y-3" style="max-height: 380px;">
+
+          <!-- Alert Item 1 -->
+          <div class="group p-3.5 rounded-xl bg-rose-500/5 border border-rose-500/10 hover:bg-rose-500/10 transition-all duration-300 cursor-pointer">
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 w-2 h-2 rounded-full bg-rose-500 animate-pulse-dot flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded">Critical</span>
+                  <span class="text-[10px] text-slate-500 font-mono">2m ago</span>
+                </div>
+                <p class="text-sm text-slate-200 font-medium leading-snug truncate">Severe anemia detected</p>
+                <p class="text-xs text-slate-400 mt-0.5">Km. Rina B. (14), Hemoglobin 6.2 g/dL - Camp-4</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alert Item 2 -->
+          <div class="group p-3.5 rounded-xl bg-amber-500/5 border border-amber-500/10 hover:bg-amber-500/10 transition-all duration-300 cursor-pointer">
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 w-2 h-2 rounded-full bg-amber-400 flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">Warning</span>
+                  <span class="text-[10px] text-slate-500 font-mono">18m ago</span>
+                </div>
+                <p class="text-sm text-slate-200 font-medium leading-snug truncate">School absenteeism alert</p>
+                <p class="text-xs text-slate-400 mt-0.5">Child missing school during menstrual period - Sector-B</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alert Item 3 -->
+          <div class="group p-3.5 rounded-xl bg-cyan-500/5 border border-cyan-500/10 hover:bg-cyan-500/10 transition-all duration-300 cursor-pointer">
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 w-2 h-2 rounded-full bg-cyan-400 flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded">Info</span>
+                  <span class="text-[10px] text-slate-500 font-mono">1h ago</span>
+                </div>
+                <p class="text-sm text-slate-200 font-medium leading-snug truncate">Missing documentation</p>
+                <p class="text-xs text-slate-400 mt-0.5">Aadhar/Bank details absent for 18 adolescents in Camp-3</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alert Item 4 -->
+          <div class="group p-3.5 rounded-xl bg-rose-500/5 border border-rose-500/10 hover:bg-rose-500/10 transition-all duration-300 cursor-pointer">
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 w-2 h-2 rounded-full bg-rose-500 animate-pulse-dot flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded">Critical</span>
+                  <span class="text-[10px] text-slate-500 font-mono">3h ago</span>
+                </div>
+                <p class="text-sm text-slate-200 font-medium leading-snug truncate">Malnutrition flag raised</p>
+                <p class="text-xs text-slate-400 mt-0.5">BMI below 3rd percentile - Km. Anjali D. (13), Sector-A</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alert Item 5 -->
+          <div class="group p-3.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 hover:bg-emerald-500/10 transition-all duration-300 cursor-pointer">
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">Resolved</span>
+                  <span class="text-[10px] text-slate-500 font-mono">5h ago</span>
+                </div>
+                <p class="text-sm text-slate-200 font-medium leading-snug truncate">IFA supply restocked</p>
+                <p class="text-xs text-slate-400 mt-0.5">180 IFA tablet strips delivered to ASHA center Sector-D</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== FOOTER / DATA SOURCES ==================== -->
+    <footer class="glass-card rounded-xl px-6 py-4 animate-stagger" style="animation-delay: 0.95s" data-animate>
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3 text-xs text-slate-500 font-body">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+          </svg>
+          <span>Live data pipeline:</span>
+          <div class="flex gap-2 ml-2">
+            <span class="px-2 py-0.5 rounded bg-white/5 border border-white/5 text-slate-400 font-mono text-[10px]">Mockup 1.xlsx</span>
+            <span class="px-2 py-0.5 rounded bg-white/5 border border-white/5 text-slate-400 font-mono text-[10px]">Mockup 2.xlsx</span>
+            <span class="px-2 py-0.5 rounded bg-white/5 border border-white/5 text-slate-400 font-mono text-[10px]">Mockup 3.xlsx</span>
+            <span class="px-2 py-0.5 rounded bg-white/5 border border-white/5 text-slate-400 font-mono text-[10px]">Mockup 4.xlsx</span>
+            <span class="px-2 py-0.5 rounded bg-white/5 border border-white/5 text-slate-400 font-mono text-[10px]">Mockup 5.xlsx</span>
+          </div>
+        </div>
+        <div class="text-xs text-slate-600 font-body">
+          Last synced: <span class="text-slate-400 font-mono">just now</span>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ==================== APPLICATION LOGIC ==================== -->
+  <script>
+    // ============================================================
+    // ANIMATION ENTRANCE LOGIC
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      const staggerElements = document.querySelectorAll('[data-animate]');
+      staggerElements.forEach(el => {
+        el.classList.add('animate-fade-in-up');
+      });
+
+      // Trigger count-up animations after short delay
+      setTimeout(() => {
+        document.querySelectorAll('[data-countup]').forEach(el => {
+          const target = parseInt(el.getAttribute('data-countup'));
+          animateValue(el, 0, target, 1800);
+        });
+      }, 400);
+    });
+
+    function animateValue(obj, start, end, duration) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        // Easing: easeOutExpo
+        const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        obj.innerHTML = Math.floor(easeProgress * (end - start) + start).toLocaleString();
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    // ============================================================
+    // CHART CONFIGURATION
+    // Colors from design system
+    // ============================================================
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = "'DM Sans', sans-serif";
+    Chart.defaults.font.size = 11;
+
+    const colorCyan = '#22d3ee';
+    const colorCyanFade = 'rgba(34, 211, 238, 0.15)';
+    const colorAmber = '#f59e0b';
+    const colorAmberFade = 'rgba(245, 158, 11, 0.15)';
+    const colorEmerald = '#34d399';
+    const colorEmeraldFade = 'rgba(52, 211, 153, 0.15)';
+    const colorRose = '#f43f5e';
+    const colorRoseFade = 'rgba(244, 63, 94, 0.15)';
+
+    // ============================================================
+    // SPARKLINE 1: ANEMIA TREND
+    // Data source: Mockup 1.xlsx -> Anemia screening monthly trend
+    // ============================================================
+    new Chart(document.getElementById('sparkAnemia'), {
+      type: 'line',
+      data: {
+        labels: ['W1', 'W2', 'W3', 'W4'],
+        datasets: [{
+          data: [42, 58, 71, 84],
+          borderColor: colorRose,
+          backgroundColor: (ctx) => {
+            const canvas = ctx.chart.ctx;
+            const gradient = canvas.createLinearGradient(0, 0, 0, 50);
+            gradient.addColorStop(0, colorRoseFade);
+            gradient.addColorStop(1, 'rgba(244, 63, 94, 0)');
+            return gradient;
+          },
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          fill: true,
+          tension: 0.4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: true, mode: 'index', intersect: false } },
+        scales: {
+          x: { display: false },
+          y: { display: false, min: 0 }
+        },
+        animation: { duration: 2000, easing: 'easeOutQuart' }
+      }
+    });
+
+    // ============================================================
+    // SPARKLINE 2: PADS SHORTAGE TREND
+    // Data source: Mockup 2.xlsx -> Menstrual hygiene supply gap
+    // ============================================================
+    new Chart(document.getElementById('sparkPads'), {
+      type: 'bar',
+      data: {
+        labels: ['W1', 'W2', 'W3', 'W4'],
+        datasets: [{
+          data: [18, 22, 28, 24],
+          backgroundColor: colorAmberFade,
+          borderColor: colorAmber,
+          borderWidth: 1,
+          borderRadius: 3,
+          barThickness: 10,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: true } },
+        scales: {
+          x: { display: false },
+          y: { display: false, min: 0 }
+        },
+        animation: { duration: 2000, easing: 'easeOutQuart', delay: 300 }
+      }
+    });
+
+    // ============================================================
+    // SPARKLINE 3: HEALTH CAMPS TREND
+    // Data source: Mockup 3.xlsx -> ASHA camp attendance log
+    // ============================================================
+    new Chart(document.getElementById('sparkCamps'), {
+      type: 'line',
+      data: {
+        labels: ['W1', 'W2', 'W3', 'W4'],
+        datasets: [{
+          data: [8, 12, 10, 15],
+          borderColor: colorEmerald,
+          backgroundColor: (ctx) => {
+            const canvas = ctx.chart.ctx;
+            const gradient = canvas.createLinearGradient(0, 0, 0, 50);
+            gradient.addColorStop(0, colorEmeraldFade);
+            gradient.addColorStop(1, 'rgba(52, 211, 153, 0)');
+            return gradient;
+          },
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          fill: true,
+          tension: 0.4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: true, mode: 'index', intersect: false } },
+        scales: {
+          x: { display: false },
+          y: { display: false, min: 0 }
+        },
+        animation: { duration: 2000, easing: 'easeOutQuart', delay: 600 }
+      }
+    });
+
+    // ============================================================
+    // MAIN CHART: GOVERNMENT SCHEMES ACCESS
+    // Data source: Mockup 4.xlsx -> Scheme application status per category
+    // ============================================================
+    new Chart(document.getElementById('schemesChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Ration Card', 'Kishori Shakti', 'Aadhar Link', 'Bank Account', 'Scholarship'],
+        datasets: [
+          {
+            label: 'Applied',
+            data: [420, 380, 520, 310, 212],
+            backgroundColor: colorCyan,
+            borderRadius: 4,
+            barPercentage: 0.6,
+            categoryPercentage: 0.7,
+          },
+          {
+            label: 'Pending',
+            data: [180, 145, 210, 68, 31],
+            backgroundColor: colorAmber,
+            borderRadius: 4,
+            barPercentage: 0.6,
+            categoryPercentage: 0.7,
+          },
+          {
+            label: 'Sanctioned',
+            data: [310, 290, 390, 198, 130],
+            backgroundColor: colorEmerald,
+            borderRadius: 4,
+            barPercentage: 0.6,
+            categoryPercentage: 0.7,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            titleColor: '#f1f5f9',
+            bodyColor: '#cbd5e1',
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1,
+            padding: 12,
+            cornerRadius: 8,
+            displayColors: true,
+            boxPadding: 4,
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: '#94a3b8', font: { size: 11 } },
+            border: { display: false }
+          },
+          y: {
+            grid: { color: 'rgba(255,255,255,0.04)' },
+            ticks: { color: '#64748b', font: { size: 10 } },
+            border: { display: false }
+          }
+        },
+        animation: {
+          duration: 2200,
+          easing: 'easeOutQuart',
+          delay: (context) => {
+            let delay = 0;
+            if (context.type === 'data' && context.mode === 'default') {
+              delay = context.dataIndex * 150 + context.datasetIndex * 100;
+            }
+            return delay;
+          }
+        }
+      }
+    });
+
+    // ============================================================
+    // MOCK DATA NOTE
+    // In production, the above charts consume data from:
+    //   /api/dashboard?source=mockup_1  (Anemia data)
+    //   /api/dashboard?source=mockup_2  (Menstrual hygiene data)
+    //   /api/dashboard?source=mockup_3  (ASHA camp data)
+    //   /api/dashboard?source=mockup_4  (Scheme tracking data)
+    //   /api/dashboard?source=mockup_5  (Alert engine data)
+    //
+    // All Excel files are processed via a Node/Python ingestion
+    // pipeline and exposed through the unified API above.
+    // ============================================================
+  </script>
+</body>
+</html>
