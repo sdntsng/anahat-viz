@@ -95,7 +95,12 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    .stagger-item { opacity: 0; animation: fadeInUp 0.6s ease-out forwards; }
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .stagger-item { opacity: 1; animation: fadeInUp 0.6s ease-out forwards; }
+
   </style>
 </head>
 
@@ -480,33 +485,21 @@
       </div>
     );
 
-    const Bar = ({ heightClass, color, label, val, delay }) => {
-      const [animated, setAnimated] = useState(false);
-      useEffect(() => {
-        const timer = setTimeout(() => setAnimated(true), delay);
-        return () => clearTimeout(timer);
-      }, [delay]);
-
+    const Bar = ({ heightClass, color, label, val }) => {
       return (
         <div className="flex flex-col items-center flex-1 group z-10">
-          <div className="text-xs font-semibold text-slate-700 mb-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">{val}</div>
+          <div className="text-xs font-semibold text-slate-700 mb-2">{val}</div>
           <div
-            className={`w-full max-w-[48px] ${color} rounded-t-md transition-all duration-700 ease-out shadow-sm relative overflow-hidden ${animated ? heightClass : 'h-0'}`}
+            className={`w-full max-w-[48px] ${color} rounded-t-md shadow-sm relative overflow-hidden ${heightClass}`}
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-100"></div>
           </div>
           <div className="text-[11px] text-slate-500 mt-4 font-medium text-center">{label}</div>
         </div>
       );
     };
 
-    const ProgressBar = ({ label, percentage, color, delay }) => {
-      const [width, setWidth] = useState(0);
-      useEffect(() => {
-        const timer = setTimeout(() => setWidth(percentage), delay);
-        return () => clearTimeout(timer);
-      }, [percentage, delay]);
-
+    const ProgressBar = ({ label, percentage, color }) => {
       return (
         <div className="group">
           <div className="flex justify-between items-center mb-2">
@@ -515,8 +508,8 @@
           </div>
           <div className="w-full bg-slate-100/80 rounded-full h-1.5 overflow-hidden">
             <div
-              className={`${color} h-1.5 rounded-full transition-all duration-1000 ease-out relative`}
-              style={{ width: `${width}%` }}
+              className={`${color} h-1.5 rounded-full relative`}
+              style={{ width: `${percentage}%` }}
             >
               <div className="absolute inset-0 bg-black/10 rounded-full"></div>
             </div>
@@ -529,58 +522,39 @@
     // MOCK DATA GENERATOR
     // ============================================================
     const generateData = () => {
-      const data = [];
-      const locations = ['Garden Colony', 'Basanti Para', 'Netaji Nagar', 'Green Valley', 'Shanti Vihar'];
-      const names = ['Priya', 'Sunita', 'Anjali', 'Rani', 'Deepa', 'Poonam', 'Kavita', 'Babita', 'Geeta', 'Seema'];
-      const ashaWorkers = [
-        { name: 'Sunita Devi', phone: '9876543210' },
-        { name: 'Manorama Singh', phone: '9123456780' },
-        { name: 'Lakshmi Prasad', phone: '9988776655' },
-        { name: 'Anita Kumari', phone: '8765432109' },
-        { name: 'Rekha Yadav', phone: '9012345678' }
+      const names = ['Priya Sharma', 'Pinky Yadav', 'Neha Kumari', 'Kajal Verma', 'Seema Kumari', 'Rina Bora', 'Anjali Gupta', 'Amit Verma', 'Pooja Singh', 'Rani Das', 'Deepa Oraon', 'Kavita Yadav', 'Babita Munda', 'Geeta Lakra', 'Sunita Rai'];
+      const locations = [
+        { name: 'Hantapara', area: 'Hantapara Tea Garden Line', ashaName: 'Sabita Minz', ashaPhone: '9876543210', anemia: ['Mild', 'Mild', 'Mild', 'Mild', 'Moderate', 'Moderate', 'Severe'], attendanceBase: 72 },
+        { name: 'Lankapara', area: 'Ramjhora Tea Garden Line 1', ashaName: 'Mamta Oraon', ashaPhone: '9876543211', anemia: ['Mild', 'Mild', 'Mild', 'Mild', 'Mild', 'Moderate', 'Severe'], attendanceBase: 73 },
+        { name: 'Dalmore', area: 'Dalmore Tea Garden Line 1', ashaName: 'Sushila Ekka', ashaPhone: '9876543212', anemia: ['Mild', 'Mild', 'Mild', 'Mild', 'Moderate', 'Moderate', 'Severe'], attendanceBase: 70 },
+        { name: 'Totopara', area: 'Totopara Sub-GP Area', ashaName: 'Manju Tirkey', ashaPhone: '9876543213', anemia: ['Mild', 'Mild', 'Mild', 'Moderate', 'Moderate', 'Moderate', 'Severe'], attendanceBase: 75 },
+        { name: 'Ramjhora', area: 'Ramjhora Labour Line', ashaName: 'Pushpa Toppo', ashaPhone: '9876543214', anemia: ['Mild', 'Mild', 'Mild', 'Moderate', 'Moderate', 'Severe', 'Mild'], attendanceBase: 88 }
       ];
 
-      locations.forEach((loc, idx) => {
-        const asha = ashaWorkers[idx % ashaWorkers.length];
-        let baseRisk = 'green';
-        if (idx === 0 || idx === 3) baseRisk = 'red';
-        if (idx === 2) baseRisk = 'blue';
-
-        for (let i = 0; i < 15; i++) {
-          const anemiaRoll = Math.random();
-          let anemia = 'Mild';
-          if (baseRisk === 'red' && anemiaRoll > 0.3) anemia = 'Severe';
-          else if (baseRisk === 'red' && anemiaRoll > 0.1) anemia = 'Moderate';
-          else if (baseRisk === 'blue' && anemiaRoll > 0.6) anemia = 'Moderate';
-          else if (anemiaRoll > 0.8) anemia = 'Moderate';
-
-          const attendanceRoll = Math.random();
-          let attendance = Math.floor(attendanceRoll * 100);
-          if (baseRisk === 'red') attendance = Math.floor(Math.random() * 50);
-          if (baseRisk === 'green') attendance = 80 + Math.floor(Math.random() * 20);
-
-          const livingRoll = Math.random();
-          let livingWithParents = 'Yes';
-          if (livingRoll > (baseRisk === 'red' ? 0.3 : 0.8)) livingWithParents = 'No';
-
-          data.push({
-            id: idx * 100 + i,
-            name: names[i % names.length] + ' ' + ['Devi', 'Kumari', 'Singh', 'Yadav'][i % 4],
-            age: 12 + Math.floor(Math.random() * 6),
-            location: loc,
+      return locations.flatMap((loc, locIndex) => (
+        Array.from({ length: 14 }, (_, rowIndex) => {
+          const seq = locIndex * 14 + rowIndex + 1;
+          const anemia = loc.anemia[rowIndex % loc.anemia.length];
+          const ashaAttendance = rowIndex < Math.round(loc.attendanceBase / 100 * 14) ? loc.attendanceBase : 100 - loc.attendanceBase;
+          const livingWithParents = rowIndex % 10 === 0 || rowIndex % 8 === 0 ? 'No' : 'Yes';
+          return {
+            id: `AH-${String(seq).padStart(4, '0')}`,
+            name: names[(seq + locIndex) % names.length],
+            age: 12 + ((seq + rowIndex) % 6),
+            location: loc.name,
+            area: loc.area,
             district: 'ALIPURDUAR',
-            block: 'BLOCK ' + String.fromCharCode(65 + idx),
-            gp: 'GP ' + loc.split(' ')[0].toUpperCase(),
+            block: 'MADARIHAT',
+            gp: 'BIRPARA-II',
             anemia,
-            ashaAttendance: attendance,
+            ashaAttendance,
             livingWithParents,
-            phone: '98' + Math.floor(Math.random() * 100000000),
-            ashaName: asha.name,
-            ashaPhone: asha.phone
-          });
-        }
-      });
-      return data;
+            phone: `98${String(41000000 + seq * 17391).slice(0, 8)}`,
+            ashaName: loc.ashaName,
+            ashaPhone: loc.ashaPhone
+          };
+        })
+      ));
     };
 
     const allData = generateData();
@@ -594,9 +568,9 @@
       { id: '307', name: 'BIRBHUM' }, { id: '308', name: 'COOCHBEHAR' },
       { id: '310', name: 'DAKSHIN DINAJPUR' }, { id: '309', name: 'DARJEELING' }
     ];
-    const blocks = ['BLOCK A', 'BLOCK B', 'BLOCK C', 'BLOCK D'];
-    const gps = ['GP GARDEN', 'GP BASANTI', 'GP NETAJI', 'GP GREEN', 'GP SHANTI'];
-    const reportFor = ['ZP', 'PS', 'GP'];
+    const blocks = ['MADARIHAT', 'FALAKATA', 'ALIPURDUAR-I', 'KALCHINI'];
+    const gps = ['BIRPARA-II', 'BANDAPANI', 'HANTAPARA', 'LANKAPARA', 'MADARIHAT'];
+    const reportFor = ['District', 'Block', 'GP', 'Sub-GP', 'ASHA Area'];
 
     const GeoFilterBar = ({ filters, setFilters, t }) => {
       const now = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'medium' });
@@ -735,6 +709,10 @@
                     </div>
                   </div>
                 </div>
+                <div className="mt-3 pt-3 border-t border-rose-100 flex items-center justify-between text-[11px] font-bold text-rose-700 uppercase tracking-wider">
+                  <span>View records</span>
+                  <ArrowRight size={13} className="text-rose-500 shrink-0" />
+                </div>
               </div>
             ))}
           </div>
@@ -742,16 +720,10 @@
       );
     };
 
-    const HorizontalBar = ({ width, color, label, val, delay, onClick, clickable }) => {
-      const [animated, setAnimated] = useState(false);
-      useEffect(() => {
-        const timer = setTimeout(() => setAnimated(true), delay);
-        return () => clearTimeout(timer);
-      }, [delay]);
-
+    const HorizontalBar = ({ width, color, label, val, onClick, clickable }) => {
       return (
         <div 
-          className={`flex items-center gap-3 mb-3 ${clickable ? 'cursor-pointer group' : ''}`}
+          className={`flex items-center gap-3 mb-3 p-2 -mx-2 rounded-xl border ${clickable ? 'cursor-pointer group border-slate-200 bg-slate-50/70 hover:border-indigo-200 hover:bg-indigo-50/70' : 'border-transparent'}`}
           onClick={onClick}
         >
           <div className="w-24 shrink-0">
@@ -759,15 +731,18 @@
           </div>
           <div className="flex-1 h-8 bg-slate-100/80 rounded-lg overflow-hidden relative">
             <div
-              className={`${color} h-full rounded-lg transition-all duration-1000 ease-out relative flex items-center justify-end pr-2`}
-              style={{ width: animated ? `${width}%` : '0%' }}
+              className={`${color} h-full rounded-lg relative flex items-center justify-end pr-2 min-w-[28px]`}
+              style={{ width: `${width}%` }}
             >
               <span className="text-[10px] font-bold text-white drop-shadow">{val}</span>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/10 rounded-lg"></div>
             </div>
           </div>
           {clickable && (
-            <ArrowRight size={14} className="text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+            <div className="h-7 px-2 rounded-full bg-white border border-slate-300 flex items-center gap-1 justify-center text-slate-600 group-hover:text-indigo-600 group-hover:border-indigo-200 group-hover:bg-indigo-50 transition-colors shrink-0 text-[10px] font-bold uppercase tracking-wider" aria-label="View table records">
+              <span>View</span>
+              <ArrowRight size={14} />
+            </div>
           )}
         </div>
       );
@@ -848,6 +823,9 @@
               <button onClick={downloadCSV} className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700 transition shadow-sm flex items-center gap-2">
                 <Download size={14} /> {t.export_btn}
               </button>
+              <a href="https://drive.google.com/" target="_blank" rel="noreferrer" className="px-4 py-2 bg-white text-slate-700 rounded-xl text-xs font-semibold hover:bg-slate-50 transition border border-slate-200 flex items-center gap-2">
+                <FileText size={14} /> Drive Link
+              </a>
             </div>
           </div>
 
@@ -859,6 +837,7 @@
                     <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t.col_zone}</th>
                     <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t.col_name}</th>
                     <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t.col_age}</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Sub-GP / Area</th>
                     <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t.col_anemia}</th>
                     <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t.col_attendance}</th>
                     <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t.col_living}</th>
@@ -873,6 +852,7 @@
                       <td className="px-6 py-4"><ZonalBadge zone={getZone(item)} t={t} /></td>
                       <td className="px-6 py-4 font-semibold text-zinc-900">{item.name}</td>
                       <td className="px-6 py-4 text-zinc-600">{item.age}</td>
+                      <td className="px-6 py-4 text-zinc-600 text-xs">{item.area}</td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
                           item.anemia === 'Severe' ? 'bg-rose-50 text-rose-700' :
