@@ -1,710 +1,591 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Project Jugnu v2 | Anahat</title>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['DM Sans', 'sans-serif'],
-            display: ['Outfit', 'sans-serif'],
-          },
-          colors: {
-            slate: {
-              50: '#f8fafc',
-              100: '#f1f5f9',
-              200: '#e2e8f0',
-              300: '#cbd5e1',
-              400: '#94a3b8',
-              500: '#64748b',
-              600: '#475569',
-              700: '#334155',
-              800: '#1e293b',
-              900: '#0f172a',
-            },
-            indigo: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-            },
-          },
-          animation: {
-            'fade-in': 'fadeIn 0.6s ease-out forwards',
-            'fade-in-up': 'fadeInUp 0.7s ease-out forwards',
-            'slide-in-right': 'slideInRight 0.5s ease-out forwards',
-            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'grow-bar': 'growBar 1.2s ease-out forwards',
-            'grow-width': 'growWidth 1.5s ease-out forwards',
-          },
-          keyframes: {
-            fadeIn: {
-              '0%': { opacity: '0' },
-              '100%': { opacity: '1' },
-            },
-            fadeInUp: {
-              '0%': { opacity: '0', transform: 'translateY(16px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
-            },
-            slideInRight: {
-              '0%': { opacity: '0', transform: 'translateX(12px)' },
-              '100%': { opacity: '1', transform: 'translateX(0)' },
-            },
-            growBar: {
-              '0%': { height: '0' },
-              '100%': { height: 'var(--bar-height)' },
-            },
-            growWidth: {
-              '0%': { width: '0%' },
-              '100%': { width: 'var(--target-width)' },
-            },
-          },
-        },
-      },
-    };
-  </script>
-
-  <!-- React & ReactDOM -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-
-  <!-- Babel for JSX -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <style>
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background-color: #FAFAFA;
-      color: #18181b;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    .stagger-item { opacity: 0; animation: fadeInUp 0.6s ease-out forwards; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adolescent Health Dashboard - Zonal View</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', 'Noto Sans', sans-serif; background-color: #f3f4f6; }
+        .dashboard-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: transform 0.2s; }
+        .dashboard-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .zone-red { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-left: 6px solid #dc2626; }
+        .zone-blue { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-left: 6px solid #2563eb; }
+        .zone-green { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-left: 6px solid #16a34a; }
+        .table-header { background-color: #f8fafc; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #e5e7eb; }
+    </style>
 </head>
-
 <body>
-  <div id="root"></div>
+    <div id="root"></div>
 
-  <script type="text/babel">
-    const { useState, useEffect } = React;
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, PieChart, Pie } = Recharts;
+        const { AlertTriangle, CheckCircle, Info, ChevronLeft, Download, Phone, User, MapPin, Calendar, Activity, ShieldAlert } = lucide;
 
-    // ============================================================
-    // INLINE ICON COMPONENTS (replacing lucide-react)
-    // ============================================================
-    const IconWrapper = ({ children, size = 20, className = "" }) => (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className={className}
-      >
-        {children}
-      </svg>
-    );
+        // --- MOCK DATA ---
+        const districts = [
+            { id: '664', name: 'ALIPURDUAR' }, { id: '305', name: 'BANKURA' },
+            { id: '307', name: 'BIRBHUM' }, { id: '308', name: 'COOCHBEHAR' },
+            { id: '310', name: 'DAKSHIN DINAJPUR' }, { id: '309', name: 'DARJEELING' }
+        ];
+        const blocks = ['BLOCK A', 'BLOCK B', 'BLOCK C', 'BLOCK D'];
+        const gps = ['GP GARDEN 1', 'GP GARDEN 2', 'GP GARDEN 3', 'GP GARDEN 4', 'GP GARDEN 5'];
+        const reportFor = ['ZP', 'PS', 'GP'];
 
-    const Users = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-      </IconWrapper>
-    );
+        const ashaWorkers = [
+            { name: 'Sunita Devi', phone: '9876543210' },
+            { name: 'Manorama Singh', phone: '9123456780' },
+            { name: 'Lakshmi Prasad', phone: '9988776655' },
+            { name: 'Anita Kumari', phone: '8765432109' },
+            { name: 'Rekha Yadav', phone: '9012345678' }
+        ];
 
-    const Droplet = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
-      </IconWrapper>
-    );
+        // Generate detailed adolescent records
+        const generateData = () => {
+            const data = [];
+            const locations = ['Garden Colony', 'Basanti Para', 'Netaji Nagar', 'Green Valley', 'Shanti Vihar'];
+            const names = ['Priya', 'Sunita', 'Anjali', 'Rani', 'Deepa', 'Poonam', 'Kavita', 'Babita', 'Geeta', 'Seema'];
+            
+            locations.forEach((loc, idx) => {
+                const asha = ashaWorkers[idx % ashaWorkers.length];
+                // Determine risk profile based on location index to create variety
+                let baseRisk = 'green';
+                if (idx === 0 || idx === 3) baseRisk = 'red';
+                if (idx === 2) baseRisk = 'blue';
 
-    const Activity = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-      </IconWrapper>
-    );
+                for (let i = 0; i < 15; i++) {
+                    const anemiaRoll = Math.random();
+                    let anemia = 'Mild';
+                    if (baseRisk === 'red' && anemiaRoll > 0.3) anemia = 'Severe';
+                    else if (baseRisk === 'red' && anemiaRoll > 0.1) anemia = 'Moderate';
+                    else if (baseRisk === 'blue' && anemiaRoll > 0.6) anemia = 'Moderate';
+                    else if (anemiaRoll > 0.8) anemia = 'Moderate';
 
-    const ShieldAlert = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-        <line x1="12" y1="8" x2="12" y2="12" />
-        <line x1="12" y1="16" x2="12.01" y2="16" />
-      </IconWrapper>
-    );
+                    const attendanceRoll = Math.random();
+                    let attendance = Math.floor(attendanceRoll * 100);
+                    if (baseRisk === 'red') attendance = Math.floor(Math.random() * 50); // Low attendance
+                    if (baseRisk === 'green') attendance = 80 + Math.floor(Math.random() * 20); // High attendance
 
-    const HeartPulse = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-        <path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27" />
-      </IconWrapper>
-    );
+                    const livingRoll = Math.random();
+                    let livingWithParents = 'Yes';
+                    if (livingRoll > (baseRisk === 'red' ? 0.3 : 0.8)) livingWithParents = 'No';
 
-    const GraduationCap = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-        <path d="M6 12v5c3 3 9 3 12 0v-5" />
-      </IconWrapper>
-    );
+                    data.push({
+                        id: idx * 100 + i,
+                        name: names[i % names.length] + ' ' + ['Devi', 'Kumari', 'Singh', 'Yadav'][i % 4],
+                        age: 12 + Math.floor(Math.random() * 6),
+                        location: loc,
+                        district: districts[0].name,
+                        block: blocks[idx % blocks.length],
+                        gp: gps[idx % gps.length],
+                        anemia,
+                        ashaAttendance: attendance,
+                        livingWithParents,
+                        phone: '98' + Math.floor(Math.random() * 100000000),
+                        ashaName: asha.name,
+                        ashaPhone: asha.phone
+                    });
+                }
+            });
+            return data;
+        };
 
-    const FileText = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-        <polyline points="14 2 14 8 20 8" />
-        <line x1="16" y1="13" x2="8" y2="13" />
-        <line x1="16" y1="17" x2="8" y2="17" />
-        <line x1="10" y1="9" x2="8" y2="9" />
-      </IconWrapper>
-    );
+        const fullData = generateData();
 
-    const Search = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </IconWrapper>
-    );
+        // --- COMPONENTS ---
 
-    const Bell = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-      </IconWrapper>
-    );
+        const ZonalBadge = ({ zone }) => {
+            const styles = {
+                red: 'bg-red-100 text-red-800 border-red-200',
+                blue: 'bg-blue-100 text-blue-800 border-blue-200',
+                green: 'bg-green-100 text-green-800 border-green-200'
+            };
+            const labels = { red: 'RED ZONE', blue: 'BLUE ZONE', green: 'GREEN ZONE' };
+            const icons = { red: <ShieldAlert size={14}/>, blue: <Info size={14}/>, green: <CheckCircle size={14}/> };
+            
+            return (
+                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${styles[zone]}`}>
+                    {icons[zone]} {labels[zone]}
+                </span>
+            );
+        };
 
-    const MapPin = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-        <circle cx="12" cy="10" r="3" />
-      </IconWrapper>
-    );
+        const FilterBar = ({ filters, setFilters }) => {
+            const now = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'medium' });
+            
+            return (
+                <div className="glass-header sticky top-0 z-50 px-6 py-4 mb-6">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <h1 className="text-2xl font-bold text-cyan-900 flex items-center gap-2">
+                                    <Activity className="text-cyan-600"/> Adolescent Health Dashboard
+                                </h1>
+                                <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                                    <Calendar size={14}/> Data as on {now}
+                                </p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button className="px-4 py-2 bg-cyan-50 text-cyan-700 rounded-lg text-sm font-medium hover:bg-cyan-100 transition">
+                                    English
+                                </button>
+                                <button className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition">
+                                    हिन्दी
+                                </button>
+                            </div>
+                        </div>
 
-    const ChevronRight = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <polyline points="9 18 15 12 9 6" />
-      </IconWrapper>
-    );
-
-    const Globe = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <circle cx="12" cy="12" r="10" />
-        <line x1="2" y1="12" x2="22" y2="12" />
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-      </IconWrapper>
-    );
-
-    const MoreHorizontal = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <circle cx="12" cy="12" r="1" />
-        <circle cx="19" cy="12" r="1" />
-        <circle cx="5" cy="12" r="1" />
-      </IconWrapper>
-    );
-
-    const TrendingUp = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-        <polyline points="17 6 23 6 23 12" />
-      </IconWrapper>
-    );
-
-    const TrendingDown = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
-        <polyline points="17 18 23 18 23 12" />
-      </IconWrapper>
-    );
-
-    const Minus = ({ size, className }) => (
-      <IconWrapper size={size} className={className}>
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </IconWrapper>
-    );
-
-    // ============================================================
-    // TRANSLATIONS
-    // ============================================================
-    const translations = {
-      en: {
-        app_title: "Project Jugnu",
-        active_area: "Active Region",
-        nav_dashboard: "Overview",
-        nav_adolescents: "Adolescents",
-        nav_schemes: "Govt. Schemes",
-        nav_camps: "Health Camps",
-        nav_edu: "Education & Goals",
-        header_title: "Early Warning System",
-        header_sub: "Monitoring health, education, and welfare for vulnerable adolescents.",
-        search_placeholder: "Search ID, Name, or Village...",
-        kpi1_title: "Total Tracked",
-        kpi1_sub: "Across 18 Tea Gardens",
-        kpi2_title: "Severe Anaemia",
-        kpi2_sub: "Hb Levels < 11.0",
-        kpi3_title: "Pad Distribution",
-        kpi3_sub: "184 pending fulfillment",
-        kpi4_title: "Pending Schemes",
-        kpi4_sub: "Ration & Health Cards",
-        chart_title: "Hemoglobin (Hb) Distribution",
-        chart_opt1: "Last 3 Months",
-        chart_opt2: "Last 6 Months",
-        chart_severe: "Severe",
-        chart_moderate: "Moderate",
-        chart_mild: "Mild",
-        chart_normal: "Normal",
-        prog1_title: "Government Scheme Status",
-        prog1_1: "Sanctioned (Received)",
-        prog1_2: "Applied (Pending)",
-        prog1_3: "Not Applied",
-        prog2_title: "Frontline Mobilization",
-        prog2_1: "Health Camps Attended",
-        prog2_2: "Anwesha Counseling",
-        prog2_3: "Deworming Completed",
-        alert_title: "Action Required",
-        alert_sub: "Vulnerability flags requiring immediate frontline follow-up.",
-        alert_btn: "View All Alerts"
-      },
-      hi: {
-        app_title: "प्रोजेक्ट जुगनू",
-        active_area: "सक्रिय क्षेत्र",
-        nav_dashboard: "अवलोकन",
-        nav_adolescents: "किशोर",
-        nav_schemes: "सरकारी योजनाएं",
-        nav_camps: "स्वास्थ्य शिविर",
-        nav_edu: "शिक्षा और लक्ष्य",
-        header_title: "प्रारंभिक चेतावनी प्रणाली",
-        header_sub: "कमजोर किशोरों के स्वास्थ्य, शिक्षा और कल्याण की निगरानी।",
-        search_placeholder: "आईडी, नाम या गांव खोजें...",
-        kpi1_title: "कुल ट्रैक किए गए",
-        kpi1_sub: "18 चाय बागानों में",
-        kpi2_title: "गंभीर एनीमिया",
-        kpi2_sub: "Hb स्तर < 11.0",
-        kpi3_title: "पैड वितरण",
-        kpi3_sub: "184 पूर्ति लंबित",
-        kpi4_title: "लंबित योजनाएं",
-        kpi4_sub: "राशन और स्वास्थ्य कार्ड",
-        chart_title: "हीमोग्लोबिन (Hb) वितरण",
-        chart_opt1: "पिछले 3 महीने",
-        chart_opt2: "पिछले 6 महीने",
-        chart_severe: "गंभीर",
-        chart_moderate: "मध्यम",
-        chart_mild: "हल्का",
-        chart_normal: "सामान्य",
-        prog1_title: "सरकारी योजना की स्थिति",
-        prog1_1: "स्वीकृत (प्राप्त)",
-        prog1_2: "आवेदन किया (लंबित)",
-        prog1_3: "आवेदन नहीं किया",
-        prog2_title: "फ्रंटलाइन मोबिलाइजेशन",
-        prog2_1: "स्वास्थ्य शिविर उपस्थित",
-        prog2_2: "अन्वेषा काउंसलिंग",
-        prog2_3: "कृमि मुक्ति पूर्ण",
-        alert_title: "कार्रवाई की आवश्यकता",
-        alert_sub: "भेद्यता फ्लैग जिन्हें तत्काल फ्रंटलाइन फॉलो-अप की आवश्यकता है।",
-        alert_btn: "सभी अलर्ट देखें"
-      }
-    };
-
-    // ============================================================
-    // SUB-COMPONENTS
-    // ============================================================
-
-    const NavItem = ({ icon, label, active, onClick }) => (
-      <button
-        onClick={onClick}
-        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm
-          ${active
-            ? 'bg-white text-indigo-600 shadow-sm border border-slate-200/80 font-semibold'
-            : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100/80 font-medium border border-transparent'}`}
-      >
-        {React.cloneElement(icon, { size: 18, className: active ? "text-indigo-600" : "text-slate-400" })}
-        {label}
-      </button>
-    );
-
-    const KpiCard = ({ title, value, subtitle, icon, iconBg, trend, trendValue, alert }) => (
-      <div className="bg-white p-6 rounded-[24px] border border-slate-200/75 shadow-sm relative overflow-hidden transition-all hover:shadow-md hover:border-slate-300/80 group stagger-item">
-        {alert && <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-rose-100/50 to-transparent rounded-bl-full -mr-8 -mt-8"></div>}
-
-        <div className="flex justify-between items-start relative z-10">
-          <div className={`w-12 h-12 rounded-2xl ${iconBg} flex items-center justify-center border border-slate-100`}>
-            {icon}
-          </div>
-
-          <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full
-            ${trend === 'up' ? 'text-emerald-600 bg-emerald-50' :
-              trend === 'down' ? 'text-rose-600 bg-rose-50' :
-              'text-slate-500 bg-slate-50'}`}
-          >
-            {trend === 'up' && <TrendingUp size={12} />}
-            {trend === 'down' && <TrendingDown size={12} />}
-            {trend === 'neutral' && <Minus size={12} />}
-            {trendValue}
-          </div>
-        </div>
-
-        <div className="mt-5 relative z-10">
-          <h3 className="text-3xl font-semibold tracking-tight text-slate-900 font-display">{value}</h3>
-          <p className="text-sm font-medium text-slate-600 mt-1">{title}</p>
-          <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
-        </div>
-      </div>
-    );
-
-    const Bar = ({ heightClass, color, label, val, delay }) => {
-      const [animated, setAnimated] = useState(false);
-      useEffect(() => {
-        const timer = setTimeout(() => setAnimated(true), delay);
-        return () => clearTimeout(timer);
-      }, [delay]);
-
-      return (
-        <div className="flex flex-col items-center flex-1 group z-10">
-          <div className="text-xs font-semibold text-slate-700 mb-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">{val}</div>
-          <div
-            className={`w-full max-w-[48px] ${color} rounded-t-md transition-all duration-700 ease-out shadow-sm relative overflow-hidden ${animated ? heightClass : 'h-0'}`}
-          >
-            <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          </div>
-          <div className="text-[11px] text-slate-500 mt-4 font-medium text-center">{label}</div>
-        </div>
-      );
-    };
-
-    const ProgressBar = ({ label, percentage, color, delay }) => {
-      const [width, setWidth] = useState(0);
-      useEffect(() => {
-        const timer = setTimeout(() => setWidth(percentage), delay);
-        return () => clearTimeout(timer);
-      }, [percentage, delay]);
-
-      return (
-        <div className="group">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-medium text-slate-600">{label}</span>
-            <span className="text-xs font-semibold text-slate-900">{percentage}%</span>
-          </div>
-          <div className="w-full bg-slate-100/80 rounded-full h-1.5 overflow-hidden">
-            <div
-              className={`${color} h-1.5 rounded-full transition-all duration-1000 ease-out relative`}
-              style={{ width: `${width}%` }}
-            >
-              <div className="absolute inset-0 bg-black/10 rounded-full"></div>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    // ============================================================
-    // MAIN DASHBOARD
-    // ============================================================
-    const Dashboard = () => {
-      const [activeTab, setActiveTab] = useState('overview');
-      const [lang, setLang] = useState('en');
-      const [searchQuery, setSearchQuery] = useState('');
-
-      const t = translations[lang];
-
-      const alerts = [
-        { id: '1001', name: 'Priya Sharma', age: 12, village: lang === 'en' ? 'Village X' : 'गाँव X', issue: lang === 'en' ? 'Critical Anaemia (Hb 10.8)' : 'गंभीर एनीमिया (Hb 10.8)', status: 'Action Required', type: 'critical' },
-        { id: '1010', name: 'Aryan Khan', age: 14, village: lang === 'en' ? 'Village Y' : 'गाँव Y', issue: lang === 'en' ? 'Missed School (3 weeks)' : 'स्कूल नहीं गए (3 सप्ताह)', status: 'Pending Counseling', type: 'warning' },
-        { id: '1015', name: 'Pinky Yadav', age: 15, village: lang === 'en' ? 'Village X' : 'गाँव X', issue: lang === 'en' ? 'No Menstrual Pads' : 'मासिक धर्म पैड नहीं', status: 'Supply Dispatch Needed', type: 'warning' },
-        { id: '1002', name: 'Amit Verma', age: 15, village: lang === 'en' ? 'Village Z' : 'गाँव Z', issue: lang === 'en' ? 'Scheme Application Pending' : 'योजना आवेदन लंबित', status: 'Follow up', type: 'info' },
-        { id: '1024', name: 'Rina Bora', age: 13, village: lang === 'en' ? 'Village W' : 'गाँव W', issue: lang === 'en' ? 'Severe Malnutrition' : 'गंभीर कुपोषण', status: 'Urgent Referral', type: 'critical' },
-        { id: '1032', name: 'Sunita Rai', age: 14, village: lang === 'en' ? 'Village Y' : 'गाँव Y', issue: lang === 'en' ? 'No Aadhar Linked' : 'आधार लिंक नहीं', status: 'Documentation Gap', type: 'info' },
-      ];
-
-      return (
-        <div className="min-h-screen bg-[#FAFAFA] text-zinc-900 flex font-sans selection:bg-indigo-100 selection:text-indigo-900">
-
-          {/* Sidebar Navigation */}
-          <aside className="w-[260px] bg-[#FAFAFA] border-r border-slate-200/80 flex flex-col hidden md:flex shrink-0">
-            <div className="px-6 pt-8 pb-6">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-sm">
-                  <HeartPulse className="text-white" size={18} strokeWidth={2.5} />
-                </div>
-                <span className="text-lg font-bold tracking-tight text-zinc-900 font-display">Anahat.</span>
-              </div>
-              <p className="text-zinc-500 text-xs mt-2 font-medium tracking-wide uppercase">{t.app_title}</p>
-            </div>
-
-            <nav className="flex-1 px-3 space-y-1 mt-2">
-              <NavItem icon={<Activity />} label={t.nav_dashboard} active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
-              <NavItem icon={<Users />} label={t.nav_adolescents} />
-              <NavItem icon={<FileText />} label={t.nav_schemes} />
-              <NavItem icon={<Activity />} label={t.nav_camps} />
-              <NavItem icon={<GraduationCap />} label={t.nav_edu} />
-            </nav>
-
-            <div className="p-4 mx-3 mb-6 bg-white border border-slate-200/80 rounded-2xl shadow-sm stagger-item" style={{ animationDelay: '0.6s' }}>
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">{t.active_area}</p>
-                <MapPin size={12} className="text-slate-400" />
-              </div>
-              <p className="text-sm font-medium text-zinc-800">
-                {lang === 'en' ? 'Alipurduar, Block-A' : 'अलीपुरद्वार, ब्लॉक-A'}
-              </p>
-            </div>
-          </aside>
-
-          {/* Main Content */}
-          <main className="flex-1 flex flex-col h-screen overflow-y-auto relative">
-
-            {/* Top Header */}
-            <header className="bg-[#FAFAFA]/80 backdrop-blur-xl border-b border-slate-200/60 px-8 py-5 flex items-center justify-between sticky top-0 z-20">
-              <div>
-                <h2 className="text-xl font-semibold tracking-tight text-zinc-900 font-display">{t.header_title}</h2>
-                <p className="text-sm text-zinc-500 mt-0.5">{t.header_sub}</p>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="relative hidden lg:block group">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={16} />
-                  <input
-                    type="text"
-                    placeholder={t.search_placeholder}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 pr-4 py-2 bg-white border border-slate-200/80 rounded-full text-sm placeholder:text-slate-400 focus:outline-none focus:border-indigo-300 focus:ring-4 focus:ring-indigo-50 transition-all w-64 shadow-sm"
-                  />
-                </div>
-
-                <div className="h-6 w-px bg-slate-200 mx-1 hidden lg:block"></div>
-
-                <button
-                  onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200/80 hover:bg-slate-50 hover:border-slate-300 text-zinc-700 rounded-full text-xs font-semibold transition-all shadow-sm"
-                >
-                  <Globe size={14} className="text-zinc-500" />
-                  {lang === 'en' ? 'हिन्दी' : 'English'}
-                </button>
-
-                <button className="relative p-2 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 rounded-full transition-colors">
-                  <Bell size={18} />
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 border-2 border-[#FAFAFA] rounded-full"></span>
-                </button>
-
-                <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center border border-indigo-100 overflow-hidden ml-1 cursor-pointer">
-                  <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Asha&backgroundColor=e0e7ff" alt="User" className="w-full h-full object-cover" />
-                </div>
-              </div>
-            </header>
-
-            {/* Dashboard Content */}
-            <div className="p-8 space-y-6 max-w-[1400px] mx-auto w-full">
-
-              {/* KPI Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                <KpiCard
-                  title={t.kpi1_title}
-                  value="1,245"
-                  subtitle={t.kpi1_sub}
-                  trend="up"
-                  trendValue="+12"
-                  icon={<Users size={20} className="text-indigo-600" />}
-                  iconBg="bg-indigo-50"
-                />
-                <KpiCard
-                  title={t.kpi2_title}
-                  value="312"
-                  subtitle={t.kpi2_sub}
-                  trend="down"
-                  trendValue="-5%"
-                  icon={<Droplet size={20} className="text-rose-600" />}
-                  iconBg="bg-rose-50"
-                  alert
-                />
-                <KpiCard
-                  title={t.kpi3_title}
-                  value="84%"
-                  subtitle={t.kpi3_sub}
-                  trend="up"
-                  trendValue="+2%"
-                  icon={<ShieldAlert size={20} className="text-amber-600" />}
-                  iconBg="bg-amber-50"
-                />
-                <KpiCard
-                  title={t.kpi4_title}
-                  value="89"
-                  subtitle={t.kpi4_sub}
-                  trend="neutral"
-                  trendValue="0"
-                  icon={<FileText size={20} className="text-emerald-600" />}
-                  iconBg="bg-emerald-50"
-                />
-              </div>
-
-              {/* Charts + Alerts */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                <div className="lg:col-span-2 space-y-6">
-
-                  {/* Hb Distribution Chart */}
-                  <div className="bg-white p-6 rounded-[24px] border border-slate-200/75 shadow-sm relative overflow-hidden stagger-item" style={{ animationDelay: '0.5s' }}>
-                    <div className="flex justify-between items-start mb-8 relative z-10">
-                      <div>
-                        <h3 className="text-base font-semibold tracking-tight text-zinc-900 flex items-center gap-2 font-display">
-                          {t.chart_title}
-                        </h3>
-                        <p className="text-sm text-zinc-500 mt-1">Population health distribution based on recent camps</p>
-                      </div>
-                      <button className="text-xs font-medium text-zinc-500 bg-zinc-50 border border-zinc-200/80 rounded-full px-3 py-1.5 hover:bg-zinc-100 transition-colors flex items-center gap-1">
-                        {t.chart_opt1} <ChevronRight size={14} />
-                      </button>
+                        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+                            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">District</label>
+                                    <select className="w-full p-2 h-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:outline-none text-sm"
+                                        value={filters.district} onChange={e => setFilters({...filters, district: e.target.value})}>
+                                        <option value="">Select District</option>
+                                        {districts.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Block</label>
+                                    <select className="w-full p-2 h-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:outline-none text-sm"
+                                        value={filters.block} onChange={e => setFilters({...filters, block: e.target.value})}>
+                                        <option value="">Select Block</option>
+                                        {blocks.map(b => <option key={b} value={b}>{b}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Gram Panchayat</label>
+                                    <select className="w-full p-2 h-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:outline-none text-sm"
+                                        value={filters.gp} onChange={e => setFilters({...filters, gp: e.target.value})}>
+                                        <option value="">Select Gram Panchayat</option>
+                                        {gps.map(g => <option key={g} value={g}>{g}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Report For <span className="text-red-500">*</span></label>
+                                    <select className="w-full p-2 h-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:outline-none text-sm"
+                                        value={filters.reportFor} onChange={e => setFilters({...filters, reportFor: e.target.value})}>
+                                        <option value="">Select Report For</option>
+                                        {reportFor.map(r => <option key={r} value={r}>{r}</option>)}
+                                    </select>
+                                </div>
+                                <button className="h-10 px-6 bg-cyan-700 text-white rounded-lg hover:bg-cyan-800 transition shadow-md font-medium text-sm flex items-center justify-center gap-2">
+                                    <MapPin size={16}/> Search
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                </div>
+            );
+        };
 
-                    <div className="relative h-60 mt-4 border-b border-zinc-200">
-                      <div className="absolute inset-0 flex flex-col justify-between pb-6">
-                        {[...Array(5)].map((_, i) => (
-                          <div key={i} className="w-full border-t border-zinc-100 h-0"></div>
+        const SummaryCards = ({ data }) => {
+            const total = data.length;
+            const checked = data.filter(d => d.anemia !== null).length;
+            const girlsChecked = Math.floor(checked * 0.69); // 69% logic
+            const redZones = new Set(data.filter(d => d.anemia === 'Severe' || d.ashaAttendance < 50).map(d => d.location)).size;
+
+            return (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 animate-fade-in">
+                    <div className="dashboard-card p-5 border-l-4 border-cyan-500">
+                        <div className="text-gray-500 text-sm font-medium">Total Adolescents Covered</div>
+                        <div className="text-3xl font-bold text-gray-800 mt-1">{total}</div>
+                    </div>
+                    <div className="dashboard-card p-5 border-l-4 border-purple-500">
+                        <div className="text-gray-500 text-sm font-medium">Checked for Anemia</div>
+                        <div className="text-3xl font-bold text-gray-800 mt-1">{Math.round((checked/total)*100)}%</div>
+                        <div className="text-xs text-gray-400 mt-1">{checked} individuals</div>
+                    </div>
+                    <div className="dashboard-card p-5 border-l-4 border-pink-500">
+                        <div className="text-gray-500 text-sm font-medium">Girls Checked</div>
+                        <div className="text-3xl font-bold text-gray-800 mt-1">42%</div>
+                        <div className="text-xs text-gray-400 mt-1">of total screened</div>
+                    </div>
+                    <div className="dashboard-card p-5 border-l-4 border-red-500">
+                        <div className="text-gray-500 text-sm font-medium">High Risk Areas (Red)</div>
+                        <div className="text-3xl font-bold text-red-600 mt-1">{redZones}</div>
+                        <div className="text-xs text-red-400 mt-1">Immediate attention</div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ZoningLayer = ({ data }) => {
+            const zones = useMemo(() => {
+                const locMap = {};
+                data.forEach(d => {
+                    if (!locMap[d.location]) locMap[d.location] = { ...d, records: [] };
+                    locMap[d.location].records.push(d);
+                });
+
+                return Object.values(locMap).map(loc => {
+                    const severe = loc.records.filter(r => r.anemia === 'Severe').length;
+                    const moderate = loc.records.filter(r => r.anemia === 'Moderate').length;
+                    const lowAttend = loc.records.filter(r => r.ashaAttendance < 50).length;
+                    const notWithParents = loc.records.filter(r => r.livingWithParents === 'No').length;
+                    const total = loc.records.length;
+
+                    let zone = 'blue';
+                    if (severe > 0 || moderate >= 2 || lowAttend > 5) zone = 'red';
+                    else if (severe === 0 && moderate === 0 && loc.records.every(r => r.ashaAttendance >= 80)) zone = 'green';
+
+                    return {
+                        location: loc.location,
+                        zone,
+                        ashaName: loc.ashaName,
+                        ashaPhone: loc.ashaPhone,
+                        stats: { severe, moderate, lowAttend, notWithParents, total }
+                    };
+                });
+            }, [data]);
+
+            const redZones = zones.filter(z => z.zone === 'red');
+
+            if (redZones.length === 0) return null;
+
+            return (
+                <div className="mb-6 animate-fade-in">
+                    <h2 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <AlertTriangle className="text-red-600"/> Critical Intervention Zones
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {redZones.map((z, i) => (
+                            <div key={i} className="zone-red rounded-xl p-4 shadow-sm">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="font-bold text-red-900">{z.location}</h3>
+                                    <ZonalBadge zone="red" />
+                                </div>
+                                <div className="text-sm text-red-800 space-y-1 mb-3">
+                                    <p>{z.stats.severe} Severe Anemia Cases</p>
+                                    <p>{z.stats.lowAttend} Low ASHA Attendance</p>
+                                </div>
+                                <div className="bg-white/50 rounded-lg p-2 mt-2 border border-red-100">
+                                    <p className="text-xs font-bold text-red-800 uppercase mb-1">Concerned ASHA Didi</p>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2 text-red-900">
+                                            <User size={16}/>
+                                            <span className="font-semibold text-sm">{z.ashaName}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-red-700">
+                                            <Phone size={14}/>
+                                            <span className="font-mono text-sm">{z.ashaPhone}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
-                      </div>
-
-                      <div className="absolute inset-0 flex items-end justify-around pb-0 px-4">
-                        <Bar heightClass="h-16" color="bg-rose-400" label="< 9.0" val="8%" delay={600} />
-                        <Bar heightClass="h-28" color="bg-amber-400" label="9.0 - 10.9" val="17%" delay={750} />
-                        <Bar heightClass="h-44" color="bg-emerald-300" label="11.0 - 11.9" val="35%" delay={900} />
-                        <Bar heightClass="h-56" color="bg-emerald-500" label="12.0+" val="40%" delay={1050} />
-                      </div>
                     </div>
-
-                    <div className="mt-6 flex gap-6 justify-center text-xs text-zinc-600 font-medium flex-wrap">
-                      <span className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-sm bg-rose-400"></div> {t.chart_severe}</span>
-                      <span className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-sm bg-amber-400"></div> {t.chart_moderate}</span>
-                      <span className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-sm bg-emerald-300"></div> {t.chart_mild}</span>
-                      <span className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-sm bg-emerald-500"></div> {t.chart_normal}</span>
-                    </div>
-                  </div>
-
-                  {/* Progress Bars */}
-                  <div className="bg-white p-6 rounded-[24px] border border-slate-200/75 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 stagger-item" style={{ animationDelay: '0.7s' }}>
-                    <div>
-                      <h3 className="text-sm font-semibold text-zinc-900 mb-5 font-display">{t.prog1_title}</h3>
-                      <div className="space-y-4">
-                        <ProgressBar label={t.prog1_1} percentage={65} color="bg-indigo-500" delay={900} />
-                        <ProgressBar label={t.prog1_2} percentage={25} color="bg-amber-400" delay={1100} />
-                        <ProgressBar label={t.prog1_3} percentage={10} color="bg-slate-300" delay={1300} />
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-semibold text-zinc-900 mb-5 font-display">{t.prog2_title}</h3>
-                      <div className="space-y-4">
-                        <ProgressBar label={t.prog2_1} percentage={78} color="bg-emerald-500" delay={1000} />
-                        <ProgressBar label={t.prog2_2} percentage={42} color="bg-rose-400" delay={1200} />
-                        <ProgressBar label={t.prog2_3} percentage={91} color="bg-indigo-400" delay={1400} />
-                      </div>
-                    </div>
-                  </div>
                 </div>
+            );
+        };
 
-                {/* Alerts Panel */}
-                <div className="bg-white rounded-[24px] border border-slate-200/75 shadow-sm overflow-hidden flex flex-col stagger-item" style={{ animationDelay: '0.65s' }}>
-                  <div className="p-6 border-b border-zinc-100 flex justify-between items-center bg-white">
-                    <div>
-                      <h3 className="text-base font-semibold tracking-tight text-zinc-900 flex items-center gap-2 font-display">
-                        {t.alert_title}
-                        <span className="flex h-2 w-2 relative">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-                        </span>
-                      </h3>
-                      <p className="text-xs text-zinc-500 mt-1">{t.alert_sub}</p>
+        const AnemiaChart = ({ data, onDrillDown }) => {
+            const chartData = useMemo(() => {
+                const locs = [...new Set(data.map(d => d.location))];
+                return locs.map(loc => {
+                    const items = data.filter(d => d.location === loc);
+                    return {
+                        name: loc,
+                        Mild: items.filter(d => d.anemia === 'Mild').length,
+                        Moderate: items.filter(d => d.anemia === 'Moderate').length,
+                        Severe: items.filter(d => d.anemia === 'Severe').length,
+                    };
+                });
+            }, [data]);
+
+            const handleClick = (entry) => {
+                if (entry && entry.activePayload) {
+                    onDrillDown('Anemia', entry.activePayload[0].payload.name);
+                }
+            };
+
+            return (
+                <div className="dashboard-card p-6 col-span-1 lg:col-span-2 animate-fade-in">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-bold text-gray-800 text-lg">Anemia Severity by Location</h3>
+                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Click bars to view details</span>
                     </div>
-                    <button className="text-zinc-400 hover:text-zinc-600 transition-colors">
-                      <MoreHorizontal size={20} />
-                    </button>
-                  </div>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={chartData} onClick={handleClick} cursor="pointer">
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                            <XAxis dataKey="name" tick={{fontSize: 12}} />
+                            <YAxis tick={{fontSize: 12}} />
+                            <Tooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
+                            <Legend />
+                            <Bar dataKey="Mild" fill="#fbbf24" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="Moderate" fill="#f97316" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="Severe" fill="#dc2626" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            );
+        };
 
-                  <div className="flex-1 overflow-y-auto p-2" style={{ maxHeight: '480px' }}>
-                    {alerts.map((alert, index) => (
-                      <div key={index} className="p-4 m-2 rounded-2xl border border-transparent hover:border-slate-200/60 hover:bg-zinc-50 transition-all cursor-pointer group flex gap-4">
-                        <div className="shrink-0 mt-1">
-                          {alert.type === 'critical' && <div className="w-2 h-2 rounded-full bg-rose-500"></div>}
-                          {alert.type === 'warning' && <div className="w-2 h-2 rounded-full bg-amber-500"></div>}
-                          {alert.type === 'info' && <div className="w-2 h-2 rounded-full bg-indigo-500"></div>}
+        const AttendanceChart = ({ data, onDrillDown }) => {
+            const chartData = useMemo(() => {
+                const locs = [...new Set(data.map(d => d.location))];
+                return locs.map(loc => {
+                    const items = data.filter(d => d.location === loc);
+                    const avg = Math.round(items.reduce((a, b) => a + b.ashaAttendance, 0) / items.length);
+                    return { name: loc, attendance: avg };
+                });
+            }, [data]);
+
+            const handleClick = (entry) => {
+                if (entry && entry.activePayload) {
+                    onDrillDown('Attendance', entry.activePayload[0].payload.name);
+                }
+            };
+
+            return (
+                <div className="dashboard-card p-6 col-span-1 animate-fade-in">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-bold text-gray-800 text-lg">ASHA Meeting Attendance</h3>
+                    </div>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={chartData} layout="vertical" onClick={handleClick} cursor="pointer">
+                            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                            <XAxis type="number" domain={[0, 100]} tick={{fontSize: 12}} />
+                            <YAxis dataKey="name" type="category" width={100} tick={{fontSize: 12}} />
+                            <Tooltip formatter={(val) => `${val}%`} contentStyle={{borderRadius: '8px'}} />
+                            <Bar dataKey="attendance" fill="#06b6d4" radius={[0, 4, 4, 0]}>
+                                {chartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.attendance < 50 ? '#ef4444' : '#06b6d4'} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            );
+        };
+
+        const LivingArrangementChart = ({ data, onDrillDown }) => {
+             const chartData = useMemo(() => {
+                const locs = [...new Set(data.map(d => d.location))];
+                return locs.map(loc => {
+                    const items = data.filter(d => d.location === loc);
+                    return {
+                        name: loc,
+                        'With Parents': items.filter(d => d.livingWithParents === 'Yes').length,
+                        'Not With Parents': items.filter(d => d.livingWithParents === 'No').length
+                    };
+                });
+            }, [data]);
+
+            const handleClick = (entry) => {
+                if (entry && entry.activePayload) {
+                    onDrillDown('Living Arrangement', entry.activePayload[0].payload.name);
+                }
+            };
+
+            return (
+                <div className="dashboard-card p-6 col-span-1 animate-fade-in">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-bold text-gray-800 text-lg">Living Arrangements</h3>
+                    </div>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={chartData} onClick={handleClick} cursor="pointer">
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                            <XAxis dataKey="name" tick={{fontSize: 12}} />
+                            <YAxis tick={{fontSize: 12}} />
+                            <Tooltip contentStyle={{borderRadius: '8px'}} />
+                            <Legend />
+                            <Bar dataKey="With Parents" fill="#10b981" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="Not With Parents" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            );
+        };
+
+        const DetailView = ({ type, location, data, onBack }) => {
+            const filteredData = data.filter(d => d.location === location);
+            
+            const getZone = (item) => {
+                if (item.anemia === 'Severe') return 'red';
+                if (item.anemia === 'Moderate') return 'blue';
+                return 'green';
+            };
+
+            const downloadCSV = () => {
+                const headers = ['Name', 'Age', 'Location', 'Anemia Status', 'ASHA Attendance %', 'Living with Parents', 'Phone', 'ASHA Didi', 'ASHA Phone'];
+                const rows = filteredData.map(d => [d.name, d.age, d.location, d.anemia, d.ashaAttendance, d.livingWithParents, d.phone, d.ashaName, d.ashaPhone]);
+                const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].map(e => e.join(",")).join("\n");
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `${location}_adolescent_data.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
+            return (
+                <div className="animate-fade-in max-w-7xl mx-auto px-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <button onClick={onBack} className="flex items-center gap-2 text-cyan-700 hover:text-cyan-900 font-medium mb-2">
+                                <ChevronLeft size={20}/> Back to Dashboard
+                            </button>
+                            <h2 className="text-2xl font-bold text-gray-800">{location} - {type} Details</h2>
+                            <p className="text-gray-500 text-sm">Showing {filteredData.length} individual records</p>
                         </div>
-
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start mb-0.5">
-                            <h4 className="text-sm font-semibold text-zinc-900">{alert.name}</h4>
-                            <span className="text-[10px] text-zinc-400 font-medium bg-white border border-zinc-100 px-1.5 py-0.5 rounded-md">#{alert.id}</span>
-                          </div>
-                          <p className="text-xs text-zinc-500 mb-3">{alert.age} {lang === 'en' ? 'yrs' : 'वर्ष'} • {alert.village}</p>
-
-                          <div className="flex items-center justify-between">
-                            <span className={`text-[10px] px-2 py-1 rounded-md font-semibold tracking-wide uppercase inline-block
-                              ${alert.type === 'critical' ? 'bg-rose-50 text-rose-700' :
-                                alert.type === 'warning' ? 'bg-amber-50 text-amber-700' :
-                                'bg-indigo-50 text-indigo-700'}`}
-                            >
-                              {alert.issue}
-                            </span>
-                          </div>
+                        <div className="flex gap-3">
+                             <button className="px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition border border-green-200 flex items-center gap-2">
+                                <Phone size={16}/> Call ASHA: {filteredData[0]?.ashaPhone}
+                            </button>
+                            <button onClick={downloadCSV} className="px-4 py-2 bg-cyan-700 text-white rounded-lg text-sm font-medium hover:bg-cyan-800 transition shadow-md flex items-center gap-2">
+                                <Download size={16}/> Export Excel / Drive
+                            </button>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="p-4 border-t border-zinc-100 bg-zinc-50/50 mt-auto">
-                    <button className="w-full py-2.5 bg-white border border-zinc-200 rounded-xl text-xs font-semibold text-zinc-700 hover:bg-zinc-50 hover:border-zinc-300 transition-all shadow-sm">
-                      {t.alert_btn}
-                    </button>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Data Sources Footer */}
-              <div className="bg-white rounded-xl px-6 py-4 border border-slate-200/75 shadow-sm stagger-item" style={{ animationDelay: '0.9s' }}>
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 text-xs text-zinc-500">
-                    <FileText size={16} className="text-zinc-400" />
-                    <span>Data pipeline:</span>
-                    <div className="flex gap-2 flex-wrap justify-center">
-                      <span className="px-2 py-0.5 rounded bg-slate-50 border border-slate-100 text-slate-500 font-mono text-[10px]">Mockup 1.xlsx</span>
-                      <span className="px-2 py-0.5 rounded bg-slate-50 border border-slate-100 text-slate-500 font-mono text-[10px]">Mockup 2.xlsx</span>
-                      <span className="px-2 py-0.5 rounded bg-slate-50 border border-slate-100 text-slate-500 font-mono text-[10px]">Mockup 3.xlsx</span>
-                      <span className="px-2 py-0.5 rounded bg-slate-50 border border-slate-100 text-slate-500 font-mono text-[10px]">Mockup 4.xlsx</span>
-                      <span className="px-2 py-0.5 rounded bg-slate-50 border border-slate-100 text-slate-500 font-mono text-[10px]">Mockup 5.xlsx</span>
                     </div>
-                  </div>
-                  <div className="text-xs text-zinc-400">
-                    Last synced: <span className="text-zinc-500 font-mono">just now</span>
-                  </div>
+
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="table-header text-xs text-gray-700 uppercase border-b border-gray-200">
+                                    <tr>
+                                        <th className="px-6 py-4 font-bold">Zone</th>
+                                        <th className="px-6 py-4 font-bold">Name</th>
+                                        <th className="px-6 py-4 font-bold">Age</th>
+                                        <th className="px-6 py-4 font-bold">Anemia Status</th>
+                                        <th className="px-6 py-4 font-bold">ASHA Attendance</th>
+                                        <th className="px-6 py-4 font-bold">Living w/ Parents</th>
+                                        <th className="px-6 py-4 font-bold">Phone Number</th>
+                                        <th className="px-6 py-4 font-bold">ASHA Didi</th>
+                                        <th className="px-6 py-4 font-bold">ASHA Contact</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {filteredData.map((item, idx) => (
+                                        <tr key={idx} className="hover:bg-gray-50 transition">
+                                            <td className="px-6 py-4"><ZonalBadge zone={getZone(item)} /></td>
+                                            <td className="px-6 py-4 font-medium text-gray-900">{item.name}</td>
+                                            <td className="px-6 py-4">{item.age}</td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-2 py-1 rounded text-xs font-bold ${
+                                                    item.anemia === 'Severe' ? 'bg-red-100 text-red-700' :
+                                                    item.anemia === 'Moderate' ? 'bg-orange-100 text-orange-700' :
+                                                    'bg-yellow-100 text-yellow-700'
+                                                }`}>
+                                                    {item.anemia}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-16 bg-gray-200 rounded-full h-2">
+                                                        <div className={`h-2 rounded-full ${item.ashaAttendance < 50 ? 'bg-red-500' : 'bg-cyan-500'}`} style={{width: `${item.ashaAttendance}%`}}></div>
+                                                    </div>
+                                                    <span className={`text-xs font-bold ${item.ashaAttendance < 50 ? 'text-red-600' : 'text-gray-600'}`}>
+                                                        {item.ashaAttendance}%
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-2 py-1 rounded text-xs font-medium ${item.livingWithParents === 'Yes' ? 'bg-green-100 text-green-700' : 'bg-indigo-100 text-indigo-700'}`}>
+                                                    {item.livingWithParents}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 font-mono text-gray-600">{item.phone}</td>
+                                            <td className="px-6 py-4 text-gray-700">{item.ashaName}</td>
+                                            <td className="px-6 py-4 font-mono text-cyan-700">{item.ashaPhone}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-              </div>
+            );
+        };
 
-            </div>
-          </main>
-        </div>
-      );
-    };
+        const App = () => {
+            const [view, setView] = useState('dashboard'); // dashboard | detail
+            const [detailConfig, setDetailConfig] = useState({});
+            const [filters, setFilters] = useState({ district: '', block: '', gp: '', reportFor: '' });
 
-    // ============================================================
-    // RENDER
-    // ============================================================
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<Dashboard />);
-  </script>
+            const handleDrillDown = (type, location) => {
+                setDetailConfig({ type, location });
+                setView('detail');
+                window.scrollTo(0, 0);
+            };
+
+            const filteredData = useMemo(() => {
+                return fullData.filter(d => {
+                    if (filters.district && d.district !== filters.district) return false;
+                    if (filters.block && d.block !== filters.block) return false;
+                    if (filters.gp && d.gp !== filters.gp) return false;
+                    return true;
+                });
+            }, [filters]);
+
+            return (
+                <div className="min-h-screen pb-12">
+                    <FilterBar filters={filters} setFilters={setFilters} />
+                    
+                    {view === 'dashboard' && (
+                        <div className="max-w-7xl mx-auto px-6 animate-fade-in">
+                            <SummaryCards data={filteredData} />
+                            <ZoningLayer data={filteredData} />
+                            
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                                <AnemiaChart data={filteredData} onDrillDown={handleDrillDown} />
+                                <AttendanceChart data={filteredData} onDrillDown={handleDrillDown} />
+                            </div>
+                            
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <LivingArrangementChart data={filteredData} onDrillDown={handleDrillDown} />
+                                <div className="dashboard-card p-6 col-span-1 lg:col-span-2 bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-100">
+                                    <h3 className="font-bold text-cyan-900 text-lg mb-2">Intervention Pipeline</h3>
+                                    <p className="text-cyan-800 text-sm mb-4">Active follow-ups and ASHA worker coordination required in the following areas:</p>
+                                    <div className="space-y-3">
+                                        {[...new Set(filteredData.filter(d => d.anemia === 'Severe').map(d => d.location))].slice(0, 3).map((loc, i) => (
+                                            <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg shadow-sm">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="bg-red-100 p-2 rounded-full text-red-600">
+                                                        <Phone size={16}/>
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-bold text-gray-800 text-sm">{loc}</p>
+                                                        <p className="text-xs text-gray-500">Severe Anemia Detected</p>
+                                                    </div>
+                                                </div>
+                                                <button onClick={() => handleDrillDown('Anemia', loc)} className="text-cyan-700 text-xs font-bold hover:underline">
+                                                    View Details
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {view === 'detail' && (
+                        <DetailView 
+                            type={detailConfig.type} 
+                            location={detailConfig.location} 
+                            data={filteredData} 
+                            onBack={() => setView('dashboard')} 
+                        />
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
