@@ -559,6 +559,14 @@
 
     const allData = generateData();
 
+    const referenceLocationMetrics = [
+      { location: 'Hantapara', nonSevere: 78, midSevere: 18, verySevere: 4, attended: 72, notAttended: 28 },
+      { location: 'Lankapara', nonSevere: 86, midSevere: 10, verySevere: 4, attended: 73, notAttended: 27 },
+      { location: 'Dalmore', nonSevere: 79, midSevere: 16, verySevere: 5, attended: 70, notAttended: 30 },
+      { location: 'Totopara', nonSevere: 65, midSevere: 30, verySevere: 5, attended: 75, notAttended: 25 },
+      { location: 'Ramjhora', nonSevere: 68, midSevere: 28, verySevere: 4, attended: 88, notAttended: 12 }
+    ];
+
     // ============================================================
     // NEW COMPONENTS
     // ============================================================
@@ -748,6 +756,146 @@
       );
     };
 
+    const TestingPill = ({ title, value }) => (
+      <div className="flex flex-col items-center justify-center">
+        <h3 className="text-xl font-bold text-zinc-900 font-display mb-3">{title}</h3>
+        <div className="flex items-center gap-3">
+          <div className="w-40 h-8 bg-zinc-900 rounded-full overflow-hidden">
+            <div className="h-full bg-red-500 rounded-full" style={{ width: `${value}%` }}></div>
+          </div>
+          <span className="text-4xl leading-none font-light text-zinc-900">{value}%</span>
+        </div>
+      </div>
+    );
+
+    const ReferenceLegend = ({ items }) => (
+      <div className="flex items-center justify-center gap-6 flex-wrap mb-7">
+        {items.map(item => (
+          <span key={item.label} className="flex items-center gap-2 text-sm font-medium text-zinc-700">
+            <span className={`w-4 h-4 rounded-full ${item.color}`}></span>
+            {item.label}
+          </span>
+        ))}
+      </div>
+    );
+
+    const ReferenceStackedChart = ({ title, subtitle, legend, rows, onSegmentClick }) => (
+      <div className="bg-white p-6 rounded-[24px] border border-slate-200/75 shadow-sm stagger-item">
+        <div className="mb-6 text-center">
+          <h3 className="text-2xl font-bold tracking-tight text-zinc-900 font-display">{title}</h3>
+          <p className="text-xs text-zinc-500 mt-1">{subtitle}</p>
+        </div>
+        <ReferenceLegend items={legend} />
+        <div className="space-y-3">
+          {rows.map(row => (
+            <div key={row.location} className="grid grid-cols-[110px_1fr] items-center gap-3">
+              <div className="text-right text-sm font-semibold text-zinc-700">{row.location}</div>
+              <div className="flex h-11 bg-slate-100 rounded-lg overflow-hidden">
+                {row.segments.map(segment => (
+                  <button
+                    key={segment.label}
+                    type="button"
+                    title={`${row.location}: ${segment.label} ${segment.value}%`}
+                    onClick={() => onSegmentClick(row.location, segment)}
+                    className={`${segment.color} ${segment.textColor || 'text-white'} h-full flex items-center justify-end px-2 text-base font-bold hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset`}
+                    style={{ width: `${segment.value}%`, minWidth: segment.value > 0 ? '28px' : '0' }}
+                  >
+                    {segment.value}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-6 pl-[122px] mt-2 text-xs text-zinc-500">
+          {[0, 20, 40, 60, 80, 100].map(tick => <span key={tick}>{tick}</span>)}
+        </div>
+      </div>
+    );
+
+    const LivingArrangementChart = ({ onDrillDown }) => (
+      <div className="bg-white p-6 rounded-[24px] border border-slate-200/75 shadow-sm stagger-item">
+        <div className="text-center mb-6">
+          <h3 className="text-2xl font-bold tracking-tight text-zinc-900 font-display">Living Arrangements</h3>
+          <p className="text-xs text-zinc-500 mt-1">Household support layer for intervention prioritization</p>
+        </div>
+        <div className="flex items-center justify-center gap-8 flex-wrap">
+          <button
+            type="button"
+            onClick={() => onDrillDown('Living Arrangement Risk', { type: 'living', label: 'Not living with both parents' })}
+            className="w-64 h-64 rounded-full relative focus:outline-none focus:ring-4 focus:ring-indigo-100"
+            style={{ background: 'conic-gradient(#4a7dec 0deg 288deg, #a489ee 288deg 324deg, #ffc568 324deg 342deg, #ed6878 342deg 360deg)' }}
+            aria-label="View living arrangement records"
+          >
+            <span className="absolute inset-[28%] rounded-full bg-white"></span>
+          </button>
+          <div className="space-y-3 text-sm font-semibold text-zinc-700">
+            <div><span className="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span>Both Parents 80%</div>
+            <div><span className="inline-block w-3 h-3 rounded-full bg-purple-400 mr-2"></span>Single Mother 10%</div>
+            <div><span className="inline-block w-3 h-3 rounded-full bg-amber-300 mr-2"></span>Relatives 5%</div>
+            <div><span className="inline-block w-3 h-3 rounded-full bg-rose-400 mr-2"></span>Other 5%</div>
+          </div>
+        </div>
+      </div>
+    );
+
+    const ReferenceGraphBlock = ({ onDrillDown }) => {
+      const anemiaRows = referenceLocationMetrics.map(item => ({
+        location: item.location,
+        segments: [
+          { label: 'Non-severe', value: item.nonSevere, color: 'bg-emerald-500', filterValue: 'Mild' },
+          { label: 'Mid-severe', value: item.midSevere, color: 'bg-yellow-400', textColor: 'text-zinc-900', filterValue: 'Moderate' },
+          { label: 'Very severe', value: item.verySevere, color: 'bg-red-500', filterValue: 'Severe' }
+        ]
+      }));
+
+      const attendanceRows = referenceLocationMetrics.map(item => ({
+        location: item.location,
+        segments: [
+          { label: 'Yes', value: item.attended, color: 'bg-emerald-600', filterValue: 'Yes' },
+          { label: 'No', value: item.notAttended, color: 'bg-teal-600', filterValue: 'No' }
+        ]
+      }));
+
+      return (
+        <div className="space-y-6">
+          <div className="bg-white p-6 rounded-[24px] border border-slate-200/75 shadow-sm stagger-item">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <TestingPill title="Thalasemia testing (%)" value={69} />
+              <TestingPill title="TB testing (%)" value={80} />
+              <TestingPill title="Anaemia testing (%)" value={86} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <ReferenceStackedChart
+              title="Anaemia level"
+              subtitle="Click any severity level to view matching adolescent records"
+              legend={[
+                { label: 'Non-severe', color: 'bg-emerald-500' },
+                { label: 'Mid-severe', color: 'bg-yellow-400' },
+                { label: 'Very severe', color: 'bg-red-500' }
+              ]}
+              rows={anemiaRows}
+              onSegmentClick={(location, segment) => onDrillDown(location, { type: 'anemia', label: segment.label, value: segment.filterValue })}
+            />
+            <ReferenceStackedChart
+              title="Adolescent attending ASHA meetings last month (%)"
+              subtitle="Click Yes or No to view matching attendance records"
+              legend={[
+                { label: 'Yes', color: 'bg-emerald-600' },
+                { label: 'No', color: 'bg-teal-600' }
+              ]}
+              rows={attendanceRows}
+              onSegmentClick={(location, segment) => onDrillDown(location, { type: 'attendance', label: `Attendance: ${segment.label}`, value: segment.filterValue })}
+            />
+          </div>
+
+          <LivingArrangementChart onDrillDown={onDrillDown} />
+        </div>
+      );
+    };
+
     const LocationChartPanel = ({ title, subtitle, data, t, onDrillDown }) => {
       const locs = [...new Set(data.map(d => d.location))];
       const locTotals = locs.map(loc => {
@@ -784,8 +932,14 @@
       );
     };
 
-    const DetailView = ({ location, data, t, onBack }) => {
-      const filteredData = data.filter(d => d.location === location);
+    const DetailView = ({ location, filter, data, t, onBack }) => {
+      const filteredData = data.filter(d => {
+        if (filter?.type === 'living') return d.livingWithParents === 'No';
+        if (d.location !== location) return false;
+        if (filter?.type === 'anemia') return d.anemia === filter.value;
+        if (filter?.type === 'attendance') return filter.value === 'Yes' ? d.ashaAttendance >= 50 : d.ashaAttendance < 50;
+        return true;
+      });
       
       const getZone = (item) => {
         if (item.anemia === 'Severe') return 'red';
@@ -794,8 +948,8 @@
       };
 
       const downloadCSV = () => {
-        const headers = [t.col_name, t.col_age, t.col_anemia, t.col_attendance, t.col_living, t.col_phone, t.col_asha_name, t.col_asha_phone];
-        const rows = filteredData.map(d => [d.name, d.age, d.anemia, d.ashaAttendance, d.livingWithParents, d.phone, d.ashaName, d.ashaPhone]);
+        const headers = [t.col_name, t.col_age, 'Sub-GP / Area', t.col_anemia, t.col_attendance, t.col_living, t.col_phone, t.col_asha_name, t.col_asha_phone];
+        const rows = filteredData.map(d => [d.name, d.age, d.area, d.anemia, d.ashaAttendance, d.livingWithParents, d.phone, d.ashaName, d.ashaPhone]);
         const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].map(e => e.join(",")).join("\n");
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
@@ -813,7 +967,7 @@
               <button onClick={onBack} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-900 font-semibold text-sm mb-2 transition-colors">
                 <ChevronLeft size={16} /> {t.back_btn}
               </button>
-              <h2 className="text-xl font-bold text-zinc-900 font-display">{location} - {t.table_title}</h2>
+              <h2 className="text-xl font-bold text-zinc-900 font-display">{location} - {filter?.label ? `${filter.label} ` : ''}{t.table_title}</h2>
               <p className="text-xs text-zinc-500 mt-1">{filteredData.length} {t.table_sub}</p>
             </div>
             <div className="flex gap-3">
@@ -899,6 +1053,7 @@
       const [searchQuery, setSearchQuery] = useState('');
       const [view, setView] = useState('overview'); // overview | detail
       const [detailLocation, setDetailLocation] = useState('');
+      const [detailFilter, setDetailFilter] = useState(null);
       const [filters, setFilters] = useState({ district: '', block: '', gp: '', reportFor: '' });
 
       const t = translations[lang];
@@ -912,14 +1067,16 @@
         });
       })();
 
-      const handleDrillDown = (loc) => {
+      const handleDrillDown = (loc, filter = null) => {
         setDetailLocation(loc);
+        setDetailFilter(filter);
         setView('detail');
       };
 
       const handleBack = () => {
         setView('overview');
         setDetailLocation('');
+        setDetailFilter(null);
       };
 
       // Chart data preparation
@@ -1031,6 +1188,7 @@
             {view === 'detail' ? (
               <DetailView 
                 location={detailLocation} 
+                filter={detailFilter}
                 data={filteredData} 
                 t={t} 
                 onBack={handleBack} 
@@ -1085,30 +1243,8 @@
                   />
                 </div>
 
-                {/* Location Charts */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <LocationChartPanel 
-                    title={t.chart_anemia_loc} 
-                    subtitle="Click bars to view individual records"
-                    data={anemiaChartData} 
-                    t={t}
-                    onDrillDown={handleDrillDown}
-                  />
-                  <LocationChartPanel 
-                    title={t.chart_attendance_loc} 
-                    subtitle="ASHA meeting attendance by area"
-                    data={attendanceChartData} 
-                    t={t}
-                    onDrillDown={handleDrillDown}
-                  />
-                  <LocationChartPanel 
-                    title={t.chart_living_loc} 
-                    subtitle="Adolescents not living with parents"
-                    data={livingChartData} 
-                    t={t}
-                    onDrillDown={handleDrillDown}
-                  />
-                </div>
+                {/* Reference Graphs */}
+                <ReferenceGraphBlock onDrillDown={handleDrillDown} />
 
                 {/* Charts + Alerts */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
