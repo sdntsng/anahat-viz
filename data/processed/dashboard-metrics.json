@@ -191,9 +191,9 @@
       "risk_zone": "red",
       "risk_flags": [
         "mild_anaemia",
-        "disease:मधुमेह",
         "disease:थैलासामिया",
         "disease:मलेरिया",
+        "disease:मधुमेह",
         "pad_shortage",
         "school_absenteeism",
         "no_restroom",
@@ -205,8 +205,8 @@
       "min_hb": 11.3,
       "camps_attended": 3,
       "camp_topics": [
-        "कानूनी अधिकार",
-        "शिक्षा"
+        "शिक्षा",
+        "कानूनी अधिकार"
       ],
       "has_aadhar": true,
       "has_bank": false,
@@ -226,9 +226,9 @@
       "risk_zone": "red",
       "risk_flags": [
         "disease:टीबी",
-        "disease:मधुमेह",
-        "disease:थैलासामिया",
         "disease:मलेरिया",
+        "disease:थैलासामिया",
+        "disease:मधुमेह",
         "pad_shortage",
         "school_absenteeism",
         "bad_toilet",
@@ -240,8 +240,8 @@
       "min_hb": 11.5,
       "camps_attended": 3,
       "camp_topics": [
-        "कानूनी अधिकार",
-        "स्वास्थ्य"
+        "स्वास्थ्य",
+        "कानूनी अधिकार"
       ],
       "has_aadhar": true,
       "has_bank": false,
@@ -261,8 +261,8 @@
       "risk_zone": "red",
       "risk_flags": [
         "disease:टीबी",
-        "disease:थैलासामिया",
         "disease:मलेरिया",
+        "disease:थैलासामिया",
         "pad_shortage",
         "school_absenteeism",
         "bad_toilet",
@@ -274,9 +274,9 @@
       "min_hb": 11.6,
       "camps_attended": 3,
       "camp_topics": [
+        "स्वास्थ्य",
         "कौशल विकास",
-        "पोषण",
-        "स्वास्थ्य"
+        "पोषण"
       ],
       "has_aadhar": true,
       "has_bank": false,
@@ -297,9 +297,9 @@
       "risk_flags": [
         "mild_anaemia",
         "disease:टीबी",
-        "disease:मधुमेह",
-        "disease:थैलासामिया",
         "disease:मलेरिया",
+        "disease:थैलासामिया",
+        "disease:मधुमेह",
         "pad_shortage",
         "school_absenteeism",
         "no_restroom",
@@ -309,9 +309,9 @@
       "min_hb": 11.0,
       "camps_attended": 3,
       "camp_topics": [
-        "कानूनी अधिकार",
+        "स्वास्थ्य",
         "कौशल विकास",
-        "स्वास्थ्य"
+        "कानूनी अधिकार"
       ],
       "has_aadhar": true,
       "has_bank": false,
@@ -331,9 +331,9 @@
       "risk_zone": "red",
       "risk_flags": [
         "disease:टीबी",
-        "disease:मधुमेह",
-        "disease:थैलासामिया",
         "disease:मलेरिया",
+        "disease:थैलासामिया",
+        "disease:मधुमेह",
         "pad_shortage",
         "school_absenteeism",
         "bad_toilet",
@@ -343,8 +343,8 @@
       "min_hb": 12.9,
       "camps_attended": 3,
       "camp_topics": [
-        "शिक्षा",
-        "स्वास्थ्य"
+        "स्वास्थ्य",
+        "शिक्षा"
       ],
       "has_aadhar": true,
       "has_bank": true,
@@ -363,9 +363,9 @@
       "risk_score": -6.0,
       "risk_zone": "red",
       "risk_flags": [
-        "disease:मधुमेह",
-        "disease:थैलासामिया",
         "disease:मलेरिया",
+        "disease:थैलासामिया",
+        "disease:मधुमेह",
         "pad_shortage",
         "school_absenteeism",
         "bad_toilet",
@@ -376,8 +376,8 @@
       "min_hb": 12.8,
       "camps_attended": 3,
       "camp_topics": [
-        "कौशल विकास",
-        "स्वास्थ्य"
+        "स्वास्थ्य",
+        "कौशल विकास"
       ],
       "has_aadhar": true,
       "has_bank": false,
@@ -397,9 +397,9 @@
       "risk_zone": "red",
       "risk_flags": [
         "disease:टीबी",
-        "disease:मधुमेह",
-        "disease:थैलासामिया",
         "disease:मलेरिया",
+        "disease:थैलासामिया",
+        "disease:मधुमेह",
         "pad_shortage",
         "school_absenteeism",
         "bad_toilet",
@@ -408,9 +408,9 @@
       "min_hb": 11.6,
       "camps_attended": 3,
       "camp_topics": [
-        "शिक्षा",
+        "स्वास्थ्य",
         "कौशल विकास",
-        "स्वास्थ्य"
+        "शिक्षा"
       ],
       "has_aadhar": true,
       "has_bank": true,
@@ -429,8 +429,8 @@
       "risk_score": -5.6,
       "risk_zone": "blue",
       "risk_flags": [
-        "disease:थैलासामिया",
         "disease:मलेरिया",
+        "disease:थैलासामिया",
         "pad_shortage",
         "school_absenteeism",
         "bad_toilet",
@@ -441,9 +441,9 @@
       "min_hb": 11.9,
       "camps_attended": 3,
       "camp_topics": [
+        "स्वास्थ्य",
         "कौशल विकास",
-        "पोषण",
-        "स्वास्थ्य"
+        "पोषण"
       ],
       "has_aadhar": true,
       "has_bank": false,
@@ -464,9 +464,9 @@
       "risk_flags": [
         "moderate_anaemia",
         "disease:टीबी",
-        "disease:मधुमेह",
-        "disease:थैलासामिया",
         "disease:मलेरिया",
+        "disease:थैलासामिया",
+        "disease:मधुमेह",
         "school_dropout"
       ],
       "min_hb": 10.0,
@@ -494,18 +494,18 @@
       "risk_zone": "blue",
       "risk_flags": [
         "moderate_anaemia",
-        "disease:मधुमेह",
-        "disease:थैलासामिया",
         "disease:मलेरिया",
+        "disease:थैलासामिया",
+        "disease:मधुमेह",
         "missing_bank",
         "no_insurance"
       ],
       "min_hb": 10.8,
       "camps_attended": 3,
       "camp_topics": [
-        "शिक्षा",
+        "स्वास्थ्य",
         "कौशल विकास",
-        "स्वास्थ्य"
+        "शिक्षा"
       ],
       "has_aadhar": true,
       "has_bank": false,
@@ -524,10 +524,10 @@
       "risk_score": -5.2,
       "risk_zone": "blue",
       "risk_flags": [
-        "disease:टीबी",
-        "disease:मधुमेह",
         "disease:थैलासामिया",
+        "disease:टीबी",
         "disease:मलेरिया",
+        "disease:मधुमेह",
         "school_absenteeism",
         "bad_toilet",
         "no_restroom",
@@ -536,9 +536,9 @@
       "min_hb": 11.6,
       "camps_attended": 3,
       "camp_topics": [
-        "कानूनी अधिकार",
+        "स्वास्थ्य",
         "शिक्षा",
-        "स्वास्थ्य"
+        "कानूनी अधिकार"
       ],
       "has_aadhar": true,
       "has_bank": false,
@@ -559,8 +559,8 @@
       "risk_flags": [
         "moderate_anaemia",
         "disease:टीबी",
-        "disease:मधुमेह",
         "disease:थैलासामिया",
+        "disease:मधुमेह",
         "missing_bank",
         "missing_ration",
         "no_insurance"
@@ -568,9 +568,9 @@
       "min_hb": 10.4,
       "camps_attended": 3,
       "camp_topics": [
-        "कौशल विकास",
+        "स्वास्थ्य",
         "शिक्षा",
-        "स्वास्थ्य"
+        "कौशल विकास"
       ],
       "has_aadhar": true,
       "has_bank": false,
@@ -600,8 +600,8 @@
       "min_hb": 12.3,
       "camps_attended": 3,
       "camp_topics": [
-        "कानूनी अधिकार",
-        "कौशल विकास"
+        "कौशल विकास",
+        "कानूनी अधिकार"
       ],
       "has_aadhar": true,
       "has_bank": true,
@@ -621,8 +621,8 @@
       "risk_zone": "blue",
       "risk_flags": [
         "moderate_anaemia",
-        "disease:मधुमेह",
         "disease:थैलासामिया",
+        "disease:मधुमेह",
         "missing_ration",
         "school_dropout"
       ],
@@ -651,8 +651,8 @@
       "risk_flags": [
         "mild_anaemia",
         "disease:टीबी",
-        "disease:मधुमेह",
         "disease:मलेरिया",
+        "disease:मधुमेह",
         "missing_bank",
         "school_dropout",
         "no_insurance"
@@ -690,8 +690,8 @@
       "min_hb": 11.2,
       "camps_attended": 3,
       "camp_topics": [
-        "कानूनी अधिकार",
-        "पोषण"
+        "पोषण",
+        "कानूनी अधिकार"
       ],
       "has_aadhar": true,
       "has_bank": true,
@@ -711,16 +711,16 @@
       "risk_zone": "green",
       "risk_flags": [
         "disease:टीबी",
-        "disease:मधुमेह",
-        "disease:थैलासामिया",
         "disease:मलेरिया",
+        "disease:थैलासामिया",
+        "disease:मधुमेह",
         "missing_ration"
       ],
       "min_hb": 13.2,
       "camps_attended": 3,
       "camp_topics": [
-        "कौशल विकास",
         "शिक्षा",
+        "कौशल विकास",
         "पोषण"
       ],
       "has_aadhar": true,
@@ -741,9 +741,9 @@
       "risk_zone": "green",
       "risk_flags": [
         "disease:टीबी",
-        "disease:मधुमेह",
-        "disease:थैलासामिया",
         "disease:मलेरिया",
+        "disease:थैलासामिया",
+        "disease:मधुमेह",
         "missing_ration"
       ],
       "min_hb": 11.9,
@@ -775,9 +775,9 @@
       "min_hb": 12.0,
       "camps_attended": 3,
       "camp_topics": [
-        "कानूनी अधिकार",
+        "स्वास्थ्य",
         "कौशल विकास",
-        "स्वास्थ्य"
+        "कानूनी अधिकार"
       ],
       "has_aadhar": true,
       "has_bank": true,
@@ -803,9 +803,9 @@
       "min_hb": 12.4,
       "camps_attended": 3,
       "camp_topics": [
+        "स्वास्थ्य",
         "कौशल विकास",
-        "पोषण",
-        "स्वास्थ्य"
+        "पोषण"
       ],
       "has_aadhar": true,
       "has_bank": false,
@@ -882,7 +882,7 @@
       "age": "12",
       "village": "गांव-एक्स",
       "panchayat": "पंचायत-6",
-      "issue": "Diabetes Detected",
+      "issue": "Malaria Detected",
       "type": "critical",
       "risk_score": -6.0,
       "asha_name": "सरस्वती देवी",
@@ -906,7 +906,7 @@
       "age": "12",
       "village": "गांव-एक्स",
       "panchayat": "पंचायत-18",
-      "issue": "Thalassemia Detected",
+      "issue": "Malaria Detected",
       "type": "warning",
       "risk_score": -5.6,
       "asha_name": "पार्वती देवी",
