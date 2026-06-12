@@ -668,7 +668,7 @@
     };
 
     const ZoningPanel = ({ data, t, onDrillDown }) => {
-      const zones = React.useMemo(() => {
+      const zones = (() => {
         const locMap = {};
         data.forEach(d => {
           if (!locMap[d.location]) locMap[d.location] = { ...d, records: [] };
@@ -690,7 +690,7 @@
             stats: { severe, moderate, lowAttend, total }
           };
         });
-      }, [data]);
+      })();
 
       const redZones = zones.filter(z => z.zone === 'red');
       if (redZones.length === 0) return null;
@@ -775,7 +775,15 @@
 
     const LocationChartPanel = ({ title, subtitle, data, t, onDrillDown }) => {
       const locs = [...new Set(data.map(d => d.location))];
-      const maxVal = Math.max(...data.map(d => d.value));
+      const locTotals = locs.map(loc => {
+        const items = data.filter(d => d.location === loc);
+        return {
+          location: loc,
+          total: items.reduce((a, b) => a + b.value, 0),
+          color: items[0]?.color || 'bg-indigo-500'
+        };
+      });
+      const maxVal = Math.max(...locTotals.map(d => d.total), 1);
       
       return (
         <div className="bg-white p-6 rounded-[24px] border border-slate-200/75 shadow-sm relative overflow-hidden stagger-item">
@@ -784,22 +792,18 @@
             <p className="text-xs text-zinc-500 mt-0.5">{subtitle}</p>
           </div>
           <div className="space-y-1">
-            {locs.map((loc, i) => {
-              const items = data.filter(d => d.location === loc);
-              const total = items.reduce((a, b) => a + b.value, 0);
-              return (
-                <HorizontalBar 
-                  key={loc}
-                  label={loc}
-                  width={Math.max((total / maxVal) * 100, 10)}
-                  val={total}
-                  color={items[0]?.color || 'bg-indigo-500'}
-                  delay={500 + i * 100}
-                  clickable
-                  onClick={() => onDrillDown(loc)}
-                />
-              );
-            })}
+            {locTotals.map((loc, i) => (
+              <HorizontalBar 
+                key={loc.location}
+                label={loc.location}
+                width={Math.max((loc.total / maxVal) * 100, 5)}
+                val={loc.total}
+                color={loc.color}
+                delay={500 + i * 100}
+                clickable
+                onClick={() => onDrillDown(loc.location)}
+              />
+            ))}
           </div>
         </div>
       );
@@ -919,14 +923,14 @@
 
       const t = translations[lang];
 
-      const filteredData = React.useMemo(() => {
+      const filteredData = (() => {
         return allData.filter(d => {
           if (filters.district && d.district !== filters.district) return false;
           if (filters.block && d.block !== filters.block) return false;
           if (filters.gp && d.gp !== filters.gp) return false;
           return true;
         });
-      }, [filters]);
+      })();
 
       const handleDrillDown = (loc) => {
         setDetailLocation(loc);
