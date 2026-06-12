@@ -1,0 +1,145 @@
+[
+  {
+    "panchayat": "पंचायत-10",
+    "zone": "red",
+    "avg_risk_score": -6.8,
+    "total_adolescents": 1,
+    "red_count": 1,
+    "blue_count": 0,
+    "green_count": 0,
+    "asha_name": "प्रिया देवी",
+    "asha_phone": "9876543210"
+  },
+  {
+    "panchayat": "पंचायत-11",
+    "zone": "red",
+    "avg_risk_score": -6.4,
+    "total_adolescents": 3,
+    "red_count": 2,
+    "blue_count": 1,
+    "green_count": 0,
+    "asha_name": "लक्ष्मी देवी",
+    "asha_phone": "9876543211"
+  },
+  {
+    "panchayat": "पंचायत-15",
+    "zone": "red",
+    "avg_risk_score": -6.3,
+    "total_adolescents": 1,
+    "red_count": 1,
+    "blue_count": 0,
+    "green_count": 0,
+    "asha_name": "रमा देवी",
+    "asha_phone": "9876543215"
+  },
+  {
+    "panchayat": "पंचायत-6",
+    "zone": "red",
+    "avg_risk_score": -6.0,
+    "total_adolescents": 2,
+    "red_count": 2,
+    "blue_count": 0,
+    "green_count": 0,
+    "asha_name": "सरस्वती देवी",
+    "asha_phone": "9876543206"
+  },
+  {
+    "panchayat": "पंचायत-3",
+    "zone": "red",
+    "avg_risk_score": -5.8,
+    "total_adolescents": 2,
+    "red_count": 1,
+    "blue_count": 1,
+    "green_count": 0,
+    "asha_name": "मीना देवी",
+    "asha_phone": "9876543203"
+  },
+  {
+    "panchayat": "पंचायत-20",
+    "zone": "blue",
+    "avg_risk_score": -5.5,
+    "total_adolescents": 1,
+    "red_count": 0,
+    "blue_count": 1,
+    "green_count": 0,
+    "asha_name": "दुर्गा देवी",
+    "asha_phone": "9876543220"
+  },
+  {
+    "panchayat": "पंचायत-16",
+    "zone": "blue",
+    "avg_risk_score": -5.2,
+    "total_adolescents": 1,
+    "red_count": 0,
+    "blue_count": 1,
+    "green_count": 0,
+    "asha_name": "सावित्री देवी",
+    "asha_phone": "9876543216"
+  },
+  {
+    "panchayat": "पंचायत-1",
+    "zone": "blue",
+    "avg_risk_score": -5.2,
+    "total_adolescents": 1,
+    "red_count": 0,
+    "blue_count": 1,
+    "green_count": 0,
+    "asha_name": "सुनीता देवी",
+    "asha_phone": "9876543201"
+  },
+  {
+    "panchayat": "पंचायत-2",
+    "zone": "blue",
+    "avg_risk_score": -5.0,
+    "total_adolescents": 1,
+    "red_count": 0,
+    "blue_count": 1,
+    "green_count": 0,
+    "asha_name": "रिंकू देवी",
+    "asha_phone": "9876543202"
+  },
+  {
+    "panchayat": "पंचायत-18",
+    "zone": "blue",
+    "avg_risk_score": -4.4,
+    "total_adolescents": 3,
+    "red_count": 0,
+    "blue_count": 2,
+    "green_count": 1,
+    "asha_name": "पार्वती देवी",
+    "asha_phone": "9876543218"
+  },
+  {
+    "panchayat": "पंचायत-12",
+    "zone": "green",
+    "avg_risk_score": -2.9,
+    "total_adolescents": 1,
+    "red_count": 0,
+    "blue_count": 0,
+    "green_count": 1,
+    "asha_name": "गीता देवी",
+    "asha_phone": "9876543212"
+  },
+  {
+    "panchayat": "पंचायत-9",
+    "zone": "green",
+    "avg_risk_score": -2.9,
+    "total_adolescents": 2,
+    "red_count": 0,
+    "blue_count": 0,
+    "green_count": 2,
+    "asha_name": "अनीता देवी",
+    "asha_phone": "9876543209"
+  },
+  {
+    "panchayat": "पंचायत-5",
+    "zone": "green",
+    "avg_risk_score": -2.8,
+    "total_adolescents": 1,
+    "red_count": 0,
+    "blue_count": 0,
+    "green_count": 1,
+    "asha_name": "कविता देवी",
+    "asha_phone": "9876543205"
+  }
+]
